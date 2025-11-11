@@ -1,0 +1,33 @@
+{
+  "name": "roadmap-portfolio-resume-builder",
+  "version": "1.0.0",
+  "description": "A platform for building learning roadmaps, online portfolios, and resumes integrated with AI APIs.",
+  "main": "src/js/main.js",
+  "scripts": {
+    "start": "live-server public",
+    "build": "webpack --mode production",
+    "dev": "webpack --mode development",
+    "test": "jest"
+  },
+  "keywords": [
+    "roadmap",
+    "portfolio",
+    "resume",
+    "AI",
+    "learning"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "three": "^0.126.0",
+    "jquery": "^3.6.0",
+    "bootstrap": "^5.1.3"
+  },
+  "devDependencies": {
+    "webpack": "^5.64.4",
+    "webpack-cli": "^4.9.1",
+    "live-server": "^1.2.1",
+    "jest": "^27.0.6"
+  }
+}
