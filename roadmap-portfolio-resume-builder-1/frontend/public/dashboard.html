@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/components.css">
+    <script src="js/main.js" defer></script>
+    <script src="js/roadmap.js" defer></script>
+    <script src="js/portfolio.js" defer></script>
+    <script src="js/resume.js" defer></script>
+    <script src="js/ai-integration.js" defer></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <h1>Welcome, <span id="user-name">User</span>!</h1>
+            <nav>
+                <ul>
+                    <li><a href="roadmap.html">Roadmap</a></li>
+                    <li><a href="portfolio.html">Portfolio</a></li>
+                    <li><a href="resume.html">Resume</a></li>
+                    <li><a href="logout.html">Logout</a></li>
+                </ul>
+            </nav>
+        </header>
+        <main>
+            <section class="roadmap-section">
+                <h2>Your Learning Roadmap</h2>
+                <div id="roadmap-display"></div>
+            </section>
+            <section class="progress-section">
+                <h2>Progress Tracker</h2>
+                <div id="progress-tracker"></div>
+            </section>
+            <section class="resources-section">
+                <h2>Recommended Resources</h2>
+                <div id="resources-list"></div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
