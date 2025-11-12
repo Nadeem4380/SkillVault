@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillVault - Build Your Career Path</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-vault"></i>
+                <h1>SkillVault</h1>
+            </div>
+            <div class="header-actions">
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="profile-btn" id="profileBtn">
+                    <i class="fas fa-user"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Profile Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-panel">
+            <div class="modal-header">
+                <h2>Profile</h2>
+                <button class="modal-close-btn" id="modalCloseBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-content">
+                <!-- User Section -->
+                <div class="profile-section">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div class="user-avatar" id="userAvatar">N</div>
+                        <div class="profile-info-item" id="nameDisplay">
+                            <div class="profile-info-label">Full Name</div>
+                            <div class="profile-info-value" id="displayName">Nadeem</div>
+                        </div>
+                    </div>
+                    <button class="edit-toggle-btn" id="editToggleBtn">
+                        <i class="fas fa-edit"></i>
+                        Edit Name
+                    </button>
+                </div>
+
+                <!-- Contact Section -->
+                <div class="profile-section">
+                    <div class="profile-section-title">Contact Information</div>
+                    <div class="profile-info-item">
+                        <div class="profile-info-label">Email</div>
+                        <div class="profile-info-value" id="displayEmail">nadeem4380@example.com</div>
+                    </div>
+                    <div class="profile-info-item">
+                        <div class="profile-info-label">Phone</div>
+                        <div class="profile-info-value" id="displayPhone">+1 (555) 000-0000</div>
+                    </div>
+                </div>
+
+                <!-- Social Section -->
+                <div class="profile-section">
+                    <div class="profile-section-title">Social Profiles</div>
+                    <a href="#" class="profile-info-value" style="text-decoration: none; color: var(--accent-primary);">
+                        <i class="fab fa-linkedin"></i> LinkedIn
+                    </a>
+                    <a href="#" class="profile-info-value" style="text-decoration: none; color: var(--accent-primary);">
+                        <i class="fab fa-github"></i> GitHub
+                    </a>
+                </div>
+
+                <!-- History Section -->
+                <div class="profile-section">
+                    <button class="history-toggle-btn" id="historyToggleBtn">
+                        <span><i class="fas fa-history"></i> My History</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="history-list" id="historyList">
+                        <div style="text-align: center; padding: 2rem 1rem; color: var(--text-secondary);">
+                            <p>No history yet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <section class="hero">
+            <h2>Master Your Career Growth</h2>
+            <p>Create personalized roadmaps and build your professional portfolio with SkillVault</p>
+        </section>
+
+        <section class="carousel-section">
+            <div style="position: relative;">
+                <div class="cards-wrapper">
+                    <div class="card active-card">
+                        <div class="card-content">
+                            <div class="card-icon">
+                                <i class="fas fa-map"></i>
+                            </div>
+                            <h2 class="card-heading">Build Roadmap</h2>
+                            <p class="card-description">Define your dream job and get a personalized learning roadmap</p>
+                            <div class="input-group">
+                                <input type="text" class="goal-input" placeholder="Enter your dream job or goal..." id="goalInput">
+                                <button class="search-btn" id="searchBtn">
+                                    <i class="fas fa-search"></i>
+                                    Search
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-content">
+                            <div class="card-icon">
+                                <i class="fas fa-briefcase"></i>
+                            </div>
+                            <h2 class="card-heading">Build Portfolio</h2>
+                            <p class="card-description">Create and showcase your professional portfolio to stand out</p>
+                            <button class="build-btn" id="buildBtn">
+                                <i class="fas fa-plus"></i>
+                                Build
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="carousel-indicators">
+                <button class="indicator active" data-slide="0"></button>
+                <button class="indicator" data-slide="1"></button>
+            </div>
+        </section>
+
+        <section class="features">
+            <h2>Why Choose SkillVault?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-brain"></i></div>
+                    <h3>Smart Roadmaps</h3>
+                    <p>AI-powered learning paths tailored to your goals</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-star"></i></div>
+                    <h3>Showcase Skills</h3>
+                    <p>Build a portfolio that impresses employers</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                    <h3>Track Progress</h3>
+                    <p>Monitor your growth with detailed analytics</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-lock"></i></div>
+                    <h3>Secure & Private</h3>
+                    <p>Your data is encrypted and always private</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 SkillVault. All rights reserved.</p>
+    </footer>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
