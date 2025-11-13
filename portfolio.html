@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SkillVault — Portfolio Builder</title>
+
+  <link rel="stylesheet" href="portfolio.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous"/>
+</head>
+<body>
+  <div class="wrap" id="builderApp">
+    <aside class="left" id="leftPanel" aria-label="Live preview">
+      <div class="logo">
+        <i class="fas fa-vault"></i>
+        <h1>SkillVault — Portfolio Builder</h1>
+      </div>
+
+      <div class="preview" id="livePreview" aria-live="polite" data-template="modern">
+        <div class="preview-top" style="display:flex;gap:12px;align-items:center">
+          <img id="profilePreviewImg" src="" alt="Profile" class="profile-img" />
+          <div>
+            <p class="name" id="pvName">Your Name</p>
+            <p class="headline" id="pvHeadline">Short professional headline — e.g., Frontend Developer</p>
+          </div>
+        </div>
+
+        <div class="muted" id="pvContact">email@example.com • +1 555 000 000</div>
+
+        <div class="preview-actions" style="margin-top:12px;">
+          <button id="previewPublicBtn" class="btn ghost" title="Preview public">Preview public</button>
+          <button id="downloadResume" class="btn primary" title="Download resume"><i class="fas fa-download"></i> Resume</button>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="projects-list" id="pvProjects" aria-hidden="true"></div>
+      </div>
+
+      <div class="bg-3d" id="bg3d" aria-hidden="true">
+        <div class="shard s1" aria-hidden="true"></div>
+        <div class="shard s2" aria-hidden="true"></div>
+        <div class="shard s3" aria-hidden="true"></div>
+        <div class="shard s4" aria-hidden="true"></div>
+      </div>
+    </aside>
+
+    <main class="right" id="rightPanel" aria-label="Portfolio builder">
+      <div class="top-row" style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:6px">
+        <button id="themeToggleBtn" class="btn ghost" title="Toggle theme"><i class="fas fa-moon"></i></button>
+      </div>
+
+      <section class="section" id="secBio">
+        <h3>Bio / About Me</h3>
+        <div class="row">
+          <div class="col">
+            <label for="name">Full name</label>
+            <input id="name" type="text" placeholder="Jane Doe" />
+          </div>
+          <div class="col">
+            <label for="headline">Headline</label>
+            <input id="headline" type="text" placeholder="Frontend Engineer • React • UI/UX" />
+          </div>
+        </div>
+
+        <label for="summary">Short summary</label>
+        <textarea id="summary" placeholder="Two-line summary or elevator pitch"></textarea>
+
+        <label for="profileImage">Profile image (optional)</label>
+        <input id="profileImage" type="file" accept="image/*" />
+        <div class="help muted">We'll show a 120×120 circular image in the preview and export.</div>
+      </section>
+
+      <section class="section" id="secSkills">
+        <h3>Skills</h3>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="skillInput" type="text" placeholder="Add skill and press Enter (e.g., React)" />
+          <button id="addSkillBtn" class="btn ghost">Add</button>
+        </div>
+        <div class="chips" id="skillsChips" aria-live="polite"></div>
+      </section>
+
+      <section class="section" id="secEducation">
+        <h3>Education</h3>
+        <div class="muted">Add your education entries (degree, institution, years).</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button id="addEducationBtn" class="btn primary"><i class="fas fa-plus"></i> Add education</button>
+          <button id="manageEducationBtn" class="btn ghost">Manage</button>
+        </div>
+        <div id="educationList" style="margin-top:10px"></div>
+      </section>
+
+      <section class="section" id="secProjects">
+        <h3>Projects / Work Samples</h3>
+        <div class="muted">Add projects with title, description, tech and links.</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button id="addProjectBtn" class="btn primary"><i class="fas fa-plus"></i> Add project</button>
+          <button id="manageProjectsBtn" class="btn ghost">Manage</button>
+        </div>
+      </section>
+
+      <section class="section" id="secContact">
+        <h3>Contact Information</h3>
+        <div class="row">
+          <div class="col">
+            <label for="email">Email</label>
+            <input id="email" type="email" placeholder="you@example.com" />
+          </div>
+          <div class="col">
+            <label for="phone">Phone</label>
+            <input id="phone" type="text" placeholder="+1 555 000 000" />
+          </div>
+        </div>
+
+        <label for="website">Website / Public URL</label>
+        <input id="website" type="url" placeholder="https://your-site.com" />
+
+        <label for="socials">Socials (comma separated)</label>
+        <input id="socials" type="text" placeholder="linkedin.com/in/you, github.com/you" />
+      </section>
+
+      <section class="section" id="secTemplate">
+        <h3>Template & Design</h3>
+        <div class="muted">Choose a layout and accent color for your public portfolio.</div>
+
+        <div class="templates" role="list" aria-label="Templates" style="margin-top:8px">
+          <div class="tpl selected" data-tpl="modern" role="listitem">Modern</div>
+          <div class="tpl" data-tpl="classic" role="listitem">Classic</div>
+          <div class="tpl" data-tpl="showcase" role="listitem">Showcase</div>
+        </div>
+
+        <label for="accentColor" style="margin-top:10px">Accent color</label>
+        <input id="accentColor" type="color" value="#0066ff" />
+      </section>
+
+      <section class="section" id="secResume">
+        <h3>Resume & Export</h3>
+        <div class="muted">Upload a PDF resume or generate a basic downloadable resume from your data.</div>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+          <input id="resumeUpload" type="file" accept=".pdf,.doc,.docx" />
+          <button id="generateResumeBtn" class="btn primary"><i class="fas fa-file-export"></i> Generate & Download</button>
+        </div>
+
+        <div class="muted" style="margin-top:8px">Export / Save</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button id="saveBtn" class="btn primary"><i class="fas fa-save"></i> Save</button>
+          <button id="exportBtn" class="btn ghost"><i class="fas fa-download"></i> Export JSON</button>
+          <button id="clearBtn" class="btn ghost"><i class="fas fa-trash"></i> Clear</button>
+        </div>
+      </section>
+
+      <div class="footer-actions">
+        <button id="cancelBtn" class="btn ghost">Cancel</button>
+        <button id="publishBtn" class="btn primary"><i class="fas fa-check"></i> Publish</button>
+      </div>
+    </main>
+  </div>
+
+  <!-- Projects modal with form -->
+  <div class="modal-backdrop" id="projectModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Add / Edit project">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3 id="projectModalTitle" style="margin:0">Add project</h3>
+        <button id="closeProjectModal" class="btn ghost">Close</button>
+      </div>
+      <form id="projectForm" style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <label class="full" for="projTitle">Title</label>
+        <input id="projTitle" class="full" name="title" placeholder="Project title" />
+        <label class="full" for="projDesc">Short description</label>
+        <textarea id="projDesc" class="full" name="description" placeholder="Brief description"></textarea>
+        <label for="projTech">Tech tags (comma separated)</label>
+        <input id="projTech" name="tech" placeholder="React, Node, CSS" />
+        <label for="projLink">Live URL</label>
+        <input id="projLink" name="link" placeholder="https://..." />
+        <label for="projRepo">Repo URL</label>
+        <input id="projRepo" name="repo" placeholder="https://github.com/..." />
+        <label for="projThumb">Thumb color</label>
+        <input id="projThumb" name="thumb" type="color" value="#4fc3f7" />
+        <div style="grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px">
+          <button type="button" id="projectDeleteBtn" class="btn ghost" style="display:none;color:#E03D3D">Delete</button>
+          <button type="submit" class="btn primary">Save project</button>
+        </div>
+        <input type="hidden" id="projId" />
+      </form>
+    </div>
+  </div>
+
+  <!-- Education modal (simple form) -->
+  <div class="modal-backdrop" id="educationModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Add / Edit education">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3 id="educationModalTitle" style="margin:0">Add education</h3>
+        <button id="closeEducationModal" class="btn ghost">Close</button>
+      </div>
+      <form id="educationForm" style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <label class="full" for="eduDegree">Degree / Program</label>
+        <input id="eduDegree" class="full" placeholder="B.Sc. Computer Science" />
+        <label for="eduInstitution">Institution</label>
+        <input id="eduInstitution" placeholder="University Name" />
+        <label for="eduYears">Years</label>
+        <input id="eduYears" placeholder="2018–2022" />
+        <div style="grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px">
+          <button type="button" id="educationDeleteBtn" class="btn ghost" style="display:none;color:#E03D3D">Delete</button>
+          <button type="submit" class="btn primary">Save education</button>
+        </div>
+        <input type="hidden" id="eduId" />
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" aria-live="polite"></div>
+
+  <script src="portfolio.js"></script>
+</body>
+</html>
