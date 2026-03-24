@@ -426,72 +426,70 @@
         this.goal = localStorage.getItem('skillvault-goal') || 'Software Engineer';
         const title = document.getElementById('roadmapTitle');
         if (title) title.textContent = `Roadmap for ${this.goal}`;
-        this.generateTimeline();
-        this.generateSkills();
-        this.generateResources('courses');
+        this.loadAIRoadmap();
         this.bindEvents();
+        async loadAIRoadmap() {
+        const data = await fetchAIRoadmap(this.goal);
+
+        if (!data) return;
+
+        this.renderTimeline(data.phases);
+        this.renderSkills(data.phases);
+        this.renderResources(data.phases);
+      }
       },
-      generateTimeline() {
-        const timeline = document.getElementById('timeline');
-        if (!timeline) return;
-        const timelineData = [
-          { month:'Month 1-2', title:'Foundations & Basics', description:`Start with fundamental concepts required for ${this.goal}. Focus on understanding core principles and building a strong foundation.`, topics:['Basics','Fundamentals','Core Concepts','Theory']},
-          { month:'Month 3-4', title:'Core Skills Development', description:'Develop essential technical skills. Practice regularly and work on beginner-level projects to reinforce learning.', topics:['Practice','Projects','Problem Solving','Coding']},
-          { month:'Month 5-6', title:'Intermediate Projects', description:'Build more complex projects combining multiple skills. Start contributing to open-source or personal portfolio projects.', topics:['Advanced Concepts','Real-world Projects','Debugging','Testing']},
-          { month:'Month 7-8', title:'Specialization & Depth', description:'Choose a specialization area and go deeper into that domain. Master advanced topics and best practices.', topics:['Specialization','Advanced Topics','Best Practices','Architecture']},
-          { month:'Month 9+', title:'Mastery & Real-world Application', description:`Master ${this.goal} skills and start applying them in real professional projects. Network and build your professional brand.`, topics:['Mastery','Professional Experience','Networking','Leadership']}
-        ];
-        timeline.innerHTML = timelineData.map(item => `
-          <div class="timeline-item">
-            <div class="timeline-content">
-              <div class="timeline-month">${item.month}</div>
-              <div class="timeline-title">${item.title}</div>
-              <div class="timeline-description">${item.description}</div>
-              <div>${item.topics.map(t => `<span class="timeline-topic">${t}</span>`).join('')}</div>
-            </div>
-          </div>
-        `).join('');
-      },
-      generateSkills() {
-        const skillsGrid = document.getElementById('skillsGrid');
-        if (!skillsGrid) return;
-        const skills = [
-          { name: 'Technical Skills', icon: 'fa-code' },
-          { name: 'Problem Solving', icon: 'fa-puzzle-piece' },
-          { name: 'System Design', icon: 'fa-sitemap' },
-          { name: 'Communication', icon: 'fa-comments' },
-          { name: 'Teamwork', icon: 'fa-users' },
-          { name: 'Continuous Learning', icon: 'fa-graduation-cap' }
-        ];
-        skillsGrid.innerHTML = skills.map(s => `
-          <div class="skill-card">
-            <div class="skill-icon"><i class="fas ${s.icon}"></i></div>
-            <div class="skill-name">${s.name}</div>
-            <div class="skill-level">Beginner → Expert</div>
-            <div class="skill-progress"><div class="skill-progress-bar"></div></div>
-          </div>
-        `).join('');
-      },
-      generateResources(category='courses') {
-        const resourcesList = document.getElementById('resourcesList');
-        if (!resourcesList) return;
-        const resources = {
-          courses: [
-            { title:`Complete ${this.goal} Masterclass`, description:'Comprehensive course covering all aspects of the field with hands-on projects.', platform:'Udemy', duration:'40 hours', level:'Beginner to Advanced' },
-            { title:`${this.goal} Fundamentals`, description:'Learn the core concepts and best practices from industry experts.', platform:'Coursera', duration:'8 weeks', level:'Beginner' },
-            { title:'Advanced Topics in Tech', description:'Deep dive into advanced concepts and emerging technologies.', platform:'edX', duration:'12 weeks', level:'Advanced' }
-          ],
-          books: [
-            { title:'The Pragmatic Programmer', description:'Essential guide to becoming a better programmer.', platform:"O'Reilly", duration:'352 pages', level:'Intermediate' },
-            { title:'Clean Code', description:'Learn to write code that is readable, maintainable, and efficient.', platform:'Prentice Hall', duration:'464 pages', level:'Intermediate' },
-            { title:'System Design Interview', description:'Master the art of designing large-scale systems.', platform:'Self-published', duration:'300 pages', level:'Advanced' }
-          ],
-          projects: [
-            { title:'Build a Real Application', description:'Create a portfolio project that showcases your skills to employers.', platform:'GitHub', duration:'4-8 weeks', level:'Intermediate' },
-            { title:'Open Source Contribution', description:'Contribute to popular open-source projects and gain real-world experience.', platform:'GitHub', duration:'Ongoing', level:'Intermediate to Advanced' },
-            { title:'Personal Portfolio Website', description:'Showcase your projects, skills, and experience through a professional portfolio.', platform:'Self-hosted', duration:'2-4 weeks', level:'Beginner to Intermediate' }
-          ]
-        };
+     renderTimeline(phases) {
+  const timeline = document.getElementById('timeline');
+
+  timeline.innerHTML = phases.map((phase, index) => `
+    <div class="timeline-item">
+      <div class="timeline-content">
+        <div class="timeline-month">${phase.duration}</div>
+        <div class="timeline-title">${phase.phase_name}</div>
+        <div class="timeline-description">
+          ${phase.topics.join(", ")}
+        </div>
+        <div>
+          ${phase.topics.map(t => `<span class="timeline-topic">${t}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+  `).join('');
+},
+      renderSkills(phases) {
+  const skillsGrid = document.getElementById('skillsGrid');
+
+  const allSkills = phases.flatMap(p => p.topics).slice(0, 6);
+
+  skillsGrid.innerHTML = allSkills.map(skill => `
+    <div class="skill-card">
+      <div class="skill-icon"><i class="fas fa-code"></i></div>
+      <div class="skill-name">${skill}</div>
+      <div class="skill-level">Learning</div>
+      <div class="skill-progress">
+        <div class="skill-progress-bar"></div>
+      </div>
+    </div>
+  `).join('');
+},
+      renderResources(phases) {
+  const resourcesList = document.getElementById('resourcesList');
+
+  const allResources = phases.flatMap(p => p.resources || []);
+
+  resourcesList.innerHTML = allResources.map(r => `
+    <div class="resource-item">
+      <div class="resource-info">
+        <div class="resource-title">${r}</div>
+        <div class="resource-description">Recommended learning resource</div>
+        <div class="resource-meta">AI Suggested</div>
+      </div>
+      <a href="#" class="resource-link">
+        <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+  `).join('');
+};
         const items = resources[category] || resources.courses;
         resourcesList.innerHTML = items.map(r => `
           <div class="resource-item">
