@@ -404,7 +404,7 @@
      **********************************************************************/
     async function fetchAIRoadmap(goal) {
   try {
-    const res = await fetch("http://localhost:5000/generate-roadmap", {
+    const res = await fetch("https://skill-vault-backend.vercel.app/api/generate-roadmap", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
