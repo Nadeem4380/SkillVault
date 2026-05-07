@@ -832,7 +832,7 @@
         const skillBars = d.skills.slice(0, 8).map(s => `
           <div class="sidebar-skill">
             <span>${esc(s)}</span>
-            <div class="skill-bar"><div class="skill-bar-fill" style="width:${60+Math.floor(Math.random()*35)}%"></div></div>
+            <div class="skill-bar"><div class="skill-bar-fill" style="width:85%"></div></div>
           </div>
         `).join('');
 
@@ -914,9 +914,11 @@
     }
 
     // ─── Export PDF ─────────────────────────────────────────────────────────────
+    // Delay allows the toast notification to render before the print dialog blocks the UI
+    const PRINT_DIALOG_DELAY_MS = 500;
     document.getElementById('downloadBtn').addEventListener('click', () => {
       showToast('🖨️ Opening print dialog for PDF export...');
-      setTimeout(() => window.print(), 500);
+      setTimeout(() => window.print(), PRINT_DIALOG_DELAY_MS);
     });
 
     // ─── Restore saved data ─────────────────────────────────────────────────────
@@ -927,8 +929,8 @@
       set('f_phone', d.phone); set('f_location', d.location);
       set('f_linkedin', d.linkedin); set('f_portfolio', d.portfolio);
       set('f_summary', d.summary);
-      d.experience.forEach(e => {}); renderExpList();
-      d.education.forEach(e => {}); renderEduList();
+      renderExpList();
+      renderEduList();
       renderSkillTags();
       renderCertList();
       renderProjList();

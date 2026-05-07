@@ -129,10 +129,22 @@ body.modal-open {
 
 @media(max-width: 768px) {
     .header-nav {
-        display: none;
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        padding: .25rem 0;
+    }
+    .nav-pill {
+        font-size: .75rem;
+        padding: .3rem .6rem;
     }
 }
 
+@media(max-width: 480px) {
+    .header-nav {
+        display: none;
+    }
+}
 
 .theme-toggle,
 .profile-btn {

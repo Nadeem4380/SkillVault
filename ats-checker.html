@@ -304,6 +304,11 @@
       themeToggle.innerHTML = dark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
     });
 
+    // ─── Constants ──────────────────────────────────────────────────────────────
+    const JD_STOPWORDS = new Set([
+      'the','and','for','are','but','not','you','all','can','had','her','was','one','our','out','day','get','has','him','his','how','its','let','may','now','old','see','two','who','did','yes','yet','far','few','set','any','use','way','say','does','here','they','then','than','from','have','will','your','with','this','that','been','into','some','also','more','were','when','what','such','well','over','even','most','just','like','into','much','need','only','very','after','about','other','would','could','which','those','these','their','there','where','being','those','both','each','many','same','upon','into','onto','upon','while','these','three','before','below','could','every','found','given','going','group','great','hence','large','later','least','light','local','might','never','often','order','other','place','point','quite','right','since','shall','still','start','state','study','taken','thing','think','those','under','until','value','where','while','whose','world','would','wrote'
+    ]);
+
     // ─── Toast ─────────────────────────────────────────────────────────────────
     function showToast(msg) {
       const t = document.getElementById('toast');
@@ -532,12 +537,15 @@
       const jd = jobDescEl.value.toLowerCase();
       if (!resumeText || !jd) return;
 
-      // Extract meaningful words from JD (filter stopwords, 4+ chars)
-      const stopwords = new Set(['with','that','this','from','have','will','your','their','they','what','when','where','been','also','more','than','into','about','which','would','other','some','such','then','these','those','were','should','could','must','well']);
-      const jdWords = [...new Set(jd.match(/[a-z]{4,}/g) || [])].filter(w => !stopwords.has(w));
+      // Extract all words (including duplicates) for frequency counting, then deduplicate for the keyword list
+      const allJdWords = (jd.match(/[a-z]{4,}/g) || []).filter(w => !JD_STOPWORDS.has(w));
+      const wordFreq = allJdWords.reduce((acc, w) => { acc[w] = (acc[w] || 0) + 1; return acc; }, {});
+      const jdWords = [...new Set(allJdWords)];
 
-      // Prioritize longer, meaningful words
-      const keywords = jdWords.sort((a, b) => b.length - a.length).slice(0, 40);
+      // Score by frequency first, then by length as tiebreaker (so "Python" beats "experienced")
+      const keywords = jdWords
+        .sort((a, b) => (wordFreq[b] - wordFreq[a]) || (b.length - a.length))
+        .slice(0, 40);
 
       const found = keywords.filter(k => resumeText.includes(k));
       const missing = keywords.filter(k => !resumeText.includes(k)).slice(0, 20);
