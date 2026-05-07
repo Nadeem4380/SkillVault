@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SkillVault — ATS Resume Checker</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" />
+  <style>
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f7f9fc;
+      --bg-tertiary: #f0f5ff;
+      --border-color: #e6eef9;
+      --text-primary: #0f1724;
+      --text-secondary: #64748b;
+      --accent-primary: #0066ff;
+      --accent-secondary: #00b7ff;
+      --accent-tertiary: rgba(0,102,255,0.08);
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --transition: all 0.2s ease;
+    }
+    :root.dark-theme {
+      --bg-primary: #0b1020;
+      --bg-secondary: #071226;
+      --bg-tertiary: #052033;
+      --border-color: #122039;
+      --text-primary: #e6eef9;
+      --text-secondary: #9fb0c8;
+      --accent-primary: #44a1ff;
+      --accent-secondary: #6ce0ff;
+      --accent-tertiary: rgba(100,160,255,0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg-secondary); color: var(--text-primary); min-height: 100vh; }
+
+    /* Header */
+    .header { background: var(--bg-primary); border-bottom: 1px solid var(--border-color); padding: 1rem 0; position: sticky; top: 0; z-index: 100; }
+    .header-content { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; gap: 1rem; flex-wrap: wrap; }
+    .logo { display: flex; align-items: center; gap: .5rem; text-decoration: none; }
+    .logo i { font-size: 1.4rem; color: var(--accent-primary); }
+    .logo h1 { font-size: 1.3rem; font-weight: 700; background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .header-nav { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
+    .nav-link { padding: .45rem .9rem; border-radius: .5rem; text-decoration: none; font-size: .85rem; font-weight: 600; color: var(--text-secondary); border: 1px solid var(--border-color); background: transparent; cursor: pointer; transition: var(--transition); }
+    .nav-link:hover, .nav-link.active { color: var(--accent-primary); border-color: var(--accent-primary); background: var(--accent-tertiary); }
+    .icon-btn { background: transparent; border: 1px solid var(--border-color); padding: .5rem; border-radius: .5rem; cursor: pointer; color: var(--text-primary); transition: var(--transition); }
+    .icon-btn:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
+
+    /* Main */
+    .main-container { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .page-hero { text-align: center; margin-bottom: 2.5rem; }
+    .page-hero h2 { font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: .5rem; }
+    .page-hero p { color: var(--text-secondary); font-size: 1rem; }
+
+    /* Layout */
+    .ats-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    @media(max-width: 900px) { .ats-layout { grid-template-columns: 1fr; } }
+
+    /* Panels */
+    .panel { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 1rem; overflow: hidden; }
+    .panel-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: .75rem; }
+    .panel-header h3 { font-size: 1rem; font-weight: 700; }
+    .panel-header .panel-icon { width: 36px; height: 36px; border-radius: .5rem; background: var(--accent-tertiary); display: flex; align-items: center; justify-content: center; color: var(--accent-primary); font-size: 1rem; }
+    .panel-body { padding: 1.5rem; }
+
+    /* Input area */
+    .resume-textarea { width: 100%; min-height: 320px; padding: 1rem; border: 1px solid var(--border-color); border-radius: .75rem; background: var(--bg-secondary); color: var(--text-primary); font-size: .88rem; line-height: 1.65; resize: vertical; font-family: 'Courier New', monospace; transition: var(--transition); }
+    .resume-textarea:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0 0 0 3px var(--accent-tertiary); }
+    .form-label { display: block; font-size: .8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: .4rem; text-transform: uppercase; letter-spacing: .03em; }
+    .form-group { margin-bottom: 1.25rem; }
+    .form-control { width: 100%; padding: .6rem .75rem; border: 1px solid var(--border-color); border-radius: .5rem; background: var(--bg-secondary); color: var(--text-primary); font-size: .9rem; font-family: inherit; transition: var(--transition); }
+    .form-control:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0 0 0 3px var(--accent-tertiary); }
+    textarea.form-control { min-height: 100px; resize: vertical; }
+
+    /* Buttons */
+    .btn { padding: .65rem 1.25rem; border-radius: .5rem; border: none; cursor: pointer; font-size: .9rem; font-weight: 600; display: inline-flex; align-items: center; gap: .4rem; transition: var(--transition); }
+    .btn-primary { background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); color: white; }
+    .btn-primary:hover { opacity: .9; transform: translateY(-1px); }
+    .btn-secondary { background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); }
+    .btn-secondary:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
+    .btn-block { width: 100%; justify-content: center; }
+
+    /* Score gauge */
+    .score-section { display: none; }
+    .score-section.visible { display: block; }
+    .score-card { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 1rem; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .score-gauge-wrap { display: flex; align-items: center; justify-content: center; gap: 2rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .score-ring { position: relative; width: 140px; height: 140px; flex-shrink: 0; }
+    .score-ring svg { transform: rotate(-90deg); }
+    .score-ring-track { fill: none; stroke: var(--border-color); stroke-width: 10; }
+    .score-ring-fill { fill: none; stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset 1s ease; }
+    .score-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .score-number { font-size: 2rem; font-weight: 800; line-height: 1; }
+    .score-label { font-size: .7rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+    .score-summary { flex: 1; min-width: 200px; }
+    .score-grade { font-size: 1.5rem; font-weight: 800; margin-bottom: .25rem; }
+    .score-message { color: var(--text-secondary); font-size: .9rem; line-height: 1.5; }
+
+    /* Category scores */
+    .category-scores { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .cat-score-card { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: .75rem; padding: 1rem; }
+    .cat-score-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: .5rem; }
+    .cat-score-name { font-size: .82rem; font-weight: 700; }
+    .cat-score-value { font-size: .82rem; font-weight: 700; }
+    .cat-score-bar { height: 6px; background: var(--border-color); border-radius: 3px; overflow: hidden; }
+    .cat-score-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
+
+    /* Feedback items */
+    .feedback-section { margin-top: 1.5rem; }
+    .feedback-section h4 { font-size: .9rem; font-weight: 700; margin-bottom: .75rem; color: var(--text-primary); }
+    .feedback-item { display: flex; align-items: flex-start; gap: .75rem; padding: .75rem; border-radius: .6rem; margin-bottom: .6rem; border: 1px solid; }
+    .feedback-item.success { background: rgba(34,197,94,.07); border-color: rgba(34,197,94,.25); }
+    .feedback-item.warning { background: rgba(245,158,11,.07); border-color: rgba(245,158,11,.25); }
+    .feedback-item.error { background: rgba(239,68,68,.07); border-color: rgba(239,68,68,.25); }
+    .feedback-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .8rem; flex-shrink: 0; }
+    .feedback-item.success .feedback-icon { background: rgba(34,197,94,.15); color: var(--success); }
+    .feedback-item.warning .feedback-icon { background: rgba(245,158,11,.15); color: var(--warning); }
+    .feedback-item.error .feedback-icon { background: rgba(239,68,68,.15); color: var(--error); }
+    .feedback-text { flex: 1; }
+    .feedback-title { font-size: .85rem; font-weight: 700; margin-bottom: .2rem; }
+    .feedback-item.success .feedback-title { color: #15803d; }
+    .feedback-item.warning .feedback-title { color: #b45309; }
+    .feedback-item.error .feedback-title { color: #b91c1c; }
+    :root.dark-theme .feedback-item.success .feedback-title { color: #4ade80; }
+    :root.dark-theme .feedback-item.warning .feedback-title { color: #fbbf24; }
+    :root.dark-theme .feedback-item.error .feedback-title { color: #f87171; }
+    .feedback-desc { font-size: .8rem; color: var(--text-secondary); line-height: 1.5; }
+
+    /* Keyword match */
+    .keyword-section { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 1rem; padding: 1.5rem; margin-bottom: 1.5rem; display: none; }
+    .keyword-section.visible { display: block; }
+    .keyword-tags { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .75rem; }
+    .kw-tag { padding: .25rem .6rem; border-radius: 999px; font-size: .78rem; font-weight: 600; }
+    .kw-tag.match { background: rgba(34,197,94,.12); color: #15803d; border: 1px solid rgba(34,197,94,.3); }
+    .kw-tag.missing { background: rgba(239,68,68,.1); color: #b91c1c; border: 1px solid rgba(239,68,68,.25); }
+    :root.dark-theme .kw-tag.match { color: #4ade80; }
+    :root.dark-theme .kw-tag.missing { color: #f87171; }
+
+    /* Placeholder state */
+    .empty-state { text-align: center; padding: 3rem 1.5rem; color: var(--text-secondary); }
+    .empty-state i { font-size: 3rem; color: var(--border-color); margin-bottom: 1rem; }
+    .empty-state h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: .5rem; color: var(--text-primary); }
+
+    /* Toast */
+    .toast { position: fixed; right: 1rem; bottom: 1rem; background: rgba(12,20,40,.92); color: #fff; padding: .65rem 1rem; border-radius: .5rem; font-weight: 600; opacity: 0; transform: translateY(8px); transition: opacity .2s, transform .2s; z-index: 9999; pointer-events: none; font-size: .88rem; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* Spinner */
+    .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.3); border-top-color: white; border-radius: 50%; animation: spin .6s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media(max-width: 600px) {
+      .page-hero h2 { font-size: 1.5rem; }
+      .score-gauge-wrap { gap: 1rem; }
+      .category-scores { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-content">
+      <a href="index.html" class="logo">
+        <i class="fas fa-vault"></i>
+        <h1>SkillVault</h1>
+      </a>
+      <nav class="header-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="resume-builder.html" class="nav-link">Resume Builder</a>
+        <a href="ats-checker.html" class="nav-link active">ATS Checker</a>
+        <a href="interactive-roadmap.html" class="nav-link">Roadmaps</a>
+        <a href="portfolio.html" class="nav-link">Portfolio</a>
+      </nav>
+      <div>
+        <button id="themeToggle" class="icon-btn" title="Toggle theme"><i class="fas fa-moon"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <div class="page-hero">
+      <h2><i class="fas fa-robot"></i> ATS Resume Checker</h2>
+      <p>Analyze your resume against Applicant Tracking System criteria and get actionable feedback.</p>
+    </div>
+
+    <div class="ats-layout">
+      <!-- Left: Input -->
+      <div>
+        <div class="panel" style="margin-bottom:1.5rem">
+          <div class="panel-header">
+            <div class="panel-icon"><i class="fas fa-paste"></i></div>
+            <h3>Paste Your Resume</h3>
+          </div>
+          <div class="panel-body">
+            <div class="form-group">
+              <label class="form-label">Resume Text *</label>
+              <textarea class="resume-textarea" id="resumeText" placeholder="Paste the full text of your resume here...&#10;&#10;Include all sections: contact info, summary, experience, education, skills, certifications, etc."></textarea>
+            </div>
+            <button class="btn btn-primary btn-block" id="analyzeBtn">
+              <i class="fas fa-search"></i> Analyze Resume
+            </button>
+          </div>
+        </div>
+
+        <!-- Optional: JD Matcher -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-icon"><i class="fas fa-file-text"></i></div>
+            <h3>Job Description Matcher <span style="font-size:.75rem;font-weight:400;color:var(--text-secondary)">(Optional)</span></h3>
+          </div>
+          <div class="panel-body">
+            <div class="form-group">
+              <label class="form-label">Paste Job Description</label>
+              <textarea class="form-control" id="jobDesc" rows="6" placeholder="Paste the job description to compare keywords and check alignment..."></textarea>
+            </div>
+            <button class="btn btn-secondary btn-block" id="matchBtn" disabled>
+              <i class="fas fa-random"></i> Match Keywords
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Results -->
+      <div>
+        <!-- Empty state -->
+        <div id="emptyState" class="panel">
+          <div class="panel-body">
+            <div class="empty-state">
+              <i class="fas fa-clipboard-check"></i>
+              <h3>Your ATS Report Will Appear Here</h3>
+              <p>Paste your resume text on the left and click <strong>Analyze Resume</strong> to get a detailed compatibility report.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Score section (hidden until analysis) -->
+        <div id="scoreSection" class="score-section">
+          <!-- Overall Score -->
+          <div class="score-card">
+            <h3 style="font-size:1rem;font-weight:700;margin-bottom:1.25rem;display:flex;align-items:center;gap:.5rem">
+              <i class="fas fa-chart-pie" style="color:var(--accent-primary)"></i> Overall ATS Score
+            </h3>
+            <div class="score-gauge-wrap">
+              <div class="score-ring">
+                <svg viewBox="0 0 140 140" width="140" height="140">
+                  <circle class="score-ring-track" cx="70" cy="70" r="60" />
+                  <circle class="score-ring-fill" id="scoreArc" cx="70" cy="70" r="60"
+                    stroke-dasharray="377" stroke-dashoffset="377" />
+                </svg>
+                <div class="score-center">
+                  <div class="score-number" id="scoreNumber">0</div>
+                  <div class="score-label">/ 100</div>
+                </div>
+              </div>
+              <div class="score-summary">
+                <div class="score-grade" id="scoreGrade">—</div>
+                <div class="score-message" id="scoreMessage"></div>
+              </div>
+            </div>
+
+            <!-- Category Scores -->
+            <div class="category-scores" id="categoryScores"></div>
+          </div>
+
+          <!-- Feedback Items -->
+          <div class="score-card feedback-section" id="feedbackList">
+            <h4><i class="fas fa-list-check" style="color:var(--accent-primary)"></i> Detailed Feedback</h4>
+          </div>
+        </div>
+
+        <!-- Keyword Match (hidden until JD match) -->
+        <div class="keyword-section" id="keywordSection">
+          <h4 style="font-size:1rem;font-weight:700;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem">
+            <i class="fas fa-tags" style="color:var(--accent-primary)"></i> Keyword Match Analysis
+          </h4>
+          <p style="font-size:.85rem;color:var(--text-secondary);margin-bottom:.75rem">
+            <span id="matchStats"></span>
+          </p>
+          <div>
+            <div style="font-size:.8rem;font-weight:700;margin-bottom:.4rem;color:var(--success)"><i class="fas fa-check-circle"></i> Keywords Found</div>
+            <div class="keyword-tags" id="foundKeywords"></div>
+          </div>
+          <div style="margin-top:1rem">
+            <div style="font-size:.8rem;font-weight:700;margin-bottom:.4rem;color:var(--error)"><i class="fas fa-times-circle"></i> Missing Keywords</div>
+            <div class="keyword-tags" id="missingKeywords"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    // ─── Theme ─────────────────────────────────────────────────────────────────
+    const themeToggle = document.getElementById('themeToggle');
+    if (localStorage.getItem('skillvault-theme') === 'dark') {
+      document.documentElement.classList.add('dark-theme');
+      themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+    }
+    themeToggle.addEventListener('click', () => {
+      const dark = document.documentElement.classList.toggle('dark-theme');
+      localStorage.setItem('skillvault-theme', dark ? 'dark' : 'light');
+      themeToggle.innerHTML = dark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    });
+
+    // ─── Toast ─────────────────────────────────────────────────────────────────
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // ─── Enable match btn when JD has text ─────────────────────────────────────
+    const jobDescEl = document.getElementById('jobDesc');
+    const matchBtn = document.getElementById('matchBtn');
+    jobDescEl.addEventListener('input', () => {
+      matchBtn.disabled = !jobDescEl.value.trim();
+    });
+
+    // ─── ATS Analysis Logic ─────────────────────────────────────────────────────
+    function analyzeResume(text) {
+      const t = text.toLowerCase();
+      const words = text.split(/\s+/).filter(Boolean);
+      const wordCount = words.length;
+
+      // ── 1. Contact Info ────────────────────────────────────────────────────
+      const hasEmail = /[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}/.test(t);
+      const hasPhone = /(\+?\d[\d\s\-().]{7,}\d)/.test(text);
+      const hasLinkedIn = /linkedin\.com/i.test(text);
+      const contactScore = (hasEmail ? 40 : 0) + (hasPhone ? 40 : 0) + (hasLinkedIn ? 20 : 0);
+
+      // ── 2. Section Completeness ─────────────────────────────────────────────
+      const hasSummary = /(summary|objective|profile|about)/i.test(text);
+      const hasExperience = /(experience|employment|work history|career)/i.test(text);
+      const hasEducation = /(education|degree|university|college|bachelor|master|phd|school)/i.test(text);
+      const hasSkills = /(skills|technologies|competencies|proficiencies|tools)/i.test(text);
+      const hasCerts = /(certification|certificate|certified|license)/i.test(text);
+      const sectionsFound = [hasSummary, hasExperience, hasEducation, hasSkills, hasCerts].filter(Boolean).length;
+      const sectionScore = Math.round((sectionsFound / 5) * 100);
+
+      // ── 3. Format Checks ────────────────────────────────────────────────────
+      const noTables = !/<table/i.test(text);
+      const wordCountOk = wordCount >= 200 && wordCount <= 1000;
+      const noSpecialChars = (text.match(/[^\x00-\x7F]/g) || []).length < 10;
+      const formatScore = (noTables ? 33 : 0) + (wordCountOk ? 34 : 0) + (noSpecialChars ? 33 : 0);
+
+      // ── 4. Keyword Density ──────────────────────────────────────────────────
+      const actionVerbs = ['developed','built','designed','implemented','led','managed','created','improved','increased','reduced','delivered','collaborated','analyzed','optimized','architected','deployed','integrated','maintained','mentored','launched'];
+      const foundVerbs = actionVerbs.filter(v => t.includes(v));
+      const verbScore = Math.min(100, Math.round((foundVerbs.length / 8) * 100));
+
+      // ── 5. Readability ──────────────────────────────────────────────────────
+      const avgSentenceLen = wordCount / Math.max(1, (text.match(/[.!?]+/g) || []).length);
+      const readabilityOk = avgSentenceLen <= 25;
+      const hasBullets = /[•\-\*]/.test(text);
+      const readabilityScore = (readabilityOk ? 50 : 25) + (hasBullets ? 25 : 0) + (wordCount > 100 ? 25 : 0);
+
+      // ── 6. Skills check ─────────────────────────────────────────────────────
+      const techSkills = ['javascript','python','java','react','node','sql','aws','docker','kubernetes','git','agile','scrum','css','html','typescript','angular','vue','mongodb','postgresql','redis'];
+      const softSkills = ['communication','leadership','teamwork','problem-solving','analytical','creative','organized','adaptable','detail-oriented','initiative'];
+      const foundTech = techSkills.filter(s => t.includes(s)).length;
+      const foundSoft = softSkills.filter(s => t.includes(s)).length;
+      const skillsScore = Math.min(100, foundTech * 12 + foundSoft * 8);
+
+      // ── Overall score ────────────────────────────────────────────────────────
+      const overall = Math.round(
+        contactScore * 0.20 +
+        sectionScore * 0.25 +
+        formatScore  * 0.15 +
+        verbScore    * 0.15 +
+        readabilityScore * 0.10 +
+        skillsScore  * 0.15
+      );
+
+      // ── Feedback items ────────────────────────────────────────────────────────
+      const feedback = [];
+
+      // Contact
+      if (hasEmail) feedback.push({ type: 'success', title: 'Email address detected', desc: 'Your resume contains a properly formatted email address.' });
+      else feedback.push({ type: 'error', title: 'No email address found', desc: 'Add a professional email address to your resume header.' });
+
+      if (hasPhone) feedback.push({ type: 'success', title: 'Phone number detected', desc: 'Phone number is present and readable.' });
+      else feedback.push({ type: 'warning', title: 'No phone number found', desc: 'Include a phone number for recruiters to contact you easily.' });
+
+      if (hasLinkedIn) feedback.push({ type: 'success', title: 'LinkedIn URL included', desc: 'LinkedIn profile link detected — great for recruiters.' });
+      else feedback.push({ type: 'warning', title: 'LinkedIn URL missing', desc: 'Adding a LinkedIn URL increases your profile credibility.' });
+
+      // Sections
+      if (hasSummary) feedback.push({ type: 'success', title: 'Professional summary found', desc: 'A summary section helps ATS understand your profile quickly.' });
+      else feedback.push({ type: 'error', title: 'No professional summary', desc: 'Add a 2-4 sentence professional summary to your resume.' });
+
+      if (hasExperience) feedback.push({ type: 'success', title: 'Work experience section detected', desc: 'ATS systems prioritize this section heavily.' });
+      else feedback.push({ type: 'error', title: 'Work experience section missing', desc: 'Add a clearly labeled "Experience" or "Work History" section.' });
+
+      if (hasEducation) feedback.push({ type: 'success', title: 'Education section found', desc: 'Education information is properly included.' });
+      else feedback.push({ type: 'warning', title: 'Education section not found', desc: 'Include an education section with degree and institution details.' });
+
+      if (hasSkills) feedback.push({ type: 'success', title: 'Skills section detected', desc: 'Dedicated skills section improves ATS keyword matching.' });
+      else feedback.push({ type: 'error', title: 'No skills section', desc: 'Add a "Skills" section listing your technical and soft skills.' });
+
+      if (hasCerts) feedback.push({ type: 'success', title: 'Certifications section found', desc: 'Certifications add credibility and searchable keywords.' });
+      else feedback.push({ type: 'warning', title: 'No certifications listed', desc: 'If you have certifications, list them to boost ATS score.' });
+
+      // Format
+      if (wordCountOk) feedback.push({ type: 'success', title: `Word count is good (${wordCount} words)`, desc: 'Your resume length is within the optimal 200–1000 word range.' });
+      else if (wordCount < 200) feedback.push({ type: 'error', title: `Resume too short (${wordCount} words)`, desc: 'Add more detail to your experience, skills, and education.' });
+      else feedback.push({ type: 'warning', title: `Resume may be too long (${wordCount} words)`, desc: 'Consider trimming to under 1000 words for better ATS parsing.' });
+
+      if (hasBullets) feedback.push({ type: 'success', title: 'Bullet points detected', desc: 'Using bullet points makes your resume easier for ATS to parse.' });
+      else feedback.push({ type: 'warning', title: 'No bullet points found', desc: 'Use bullet points (•, -, *) to list responsibilities and achievements.' });
+
+      // Action verbs
+      if (foundVerbs.length >= 5) feedback.push({ type: 'success', title: `Good use of action verbs (${foundVerbs.length} found)`, desc: `Found: ${foundVerbs.join(', ')}` });
+      else if (foundVerbs.length > 0) feedback.push({ type: 'warning', title: `Few action verbs (${foundVerbs.length} found)`, desc: `Found: ${foundVerbs.join(', ')}. Try adding more like: developed, implemented, led, optimized.` });
+      else feedback.push({ type: 'error', title: 'No action verbs detected', desc: 'Start bullet points with action verbs like: developed, built, managed, led, created.' });
+
+      if (foundTech >= 3) feedback.push({ type: 'success', title: `Technical skills detected (${foundTech})`, desc: 'Good keyword coverage for technical positions.' });
+      else feedback.push({ type: 'warning', title: 'Few technical keywords', desc: 'Add specific technologies, frameworks, and tools relevant to your target role.' });
+
+      if (!readabilityOk) feedback.push({ type: 'warning', title: 'Sentences may be too long', desc: 'Keep sentences concise. ATS systems prefer shorter, scannable text.' });
+
+      return {
+        overall,
+        categories: [
+          { name: 'Contact Info', score: contactScore, color: contactScore >= 70 ? '#22c55e' : contactScore >= 40 ? '#f59e0b' : '#ef4444' },
+          { name: 'Sections', score: sectionScore, color: sectionScore >= 70 ? '#22c55e' : sectionScore >= 40 ? '#f59e0b' : '#ef4444' },
+          { name: 'Format', score: formatScore, color: formatScore >= 70 ? '#22c55e' : formatScore >= 40 ? '#f59e0b' : '#ef4444' },
+          { name: 'Keywords', score: verbScore, color: verbScore >= 70 ? '#22c55e' : verbScore >= 40 ? '#f59e0b' : '#ef4444' },
+          { name: 'Skills', score: Math.min(100, skillsScore), color: skillsScore >= 50 ? '#22c55e' : skillsScore >= 30 ? '#f59e0b' : '#ef4444' },
+          { name: 'Readability', score: readabilityScore, color: readabilityScore >= 70 ? '#22c55e' : readabilityScore >= 40 ? '#f59e0b' : '#ef4444' },
+        ],
+        feedback
+      };
+    }
+
+    function getGrade(score) {
+      if (score >= 85) return { grade: '🏆 Excellent', msg: 'Your resume is highly ATS-compatible. You\'re ready to apply!', color: '#22c55e' };
+      if (score >= 70) return { grade: '✅ Good', msg: 'Your resume is mostly ATS-friendly. A few improvements will make it even better.', color: '#16a34a' };
+      if (score >= 55) return { grade: '⚠️ Fair', msg: 'Several improvements needed. Address the warnings below to increase your score.', color: '#f59e0b' };
+      if (score >= 35) return { grade: '❌ Needs Work', msg: 'Significant changes are needed. Follow the recommendations below.', color: '#ef4444' };
+      return { grade: '🚨 Poor', msg: 'Major issues detected. Please review all feedback items below.', color: '#b91c1c' };
+    }
+
+    function renderResults(result) {
+      document.getElementById('emptyState').style.display = 'none';
+      document.getElementById('scoreSection').classList.add('visible');
+
+      // Animate score ring
+      const circumference = 377;
+      const offset = circumference - (result.overall / 100) * circumference;
+      const arc = document.getElementById('scoreArc');
+      const grade = getGrade(result.overall);
+      arc.style.stroke = grade.color;
+
+      // Animate number
+      const numEl = document.getElementById('scoreNumber');
+      let current = 0;
+      const target = result.overall;
+      const step = Math.max(1, Math.round(target / 40));
+      const timer = setInterval(() => {
+        current = Math.min(current + step, target);
+        numEl.textContent = current;
+        if (current >= target) {
+          clearInterval(timer);
+          arc.style.strokeDashoffset = offset;
+        }
+      }, 30);
+      arc.style.strokeDashoffset = offset;
+      numEl.style.color = grade.color;
+
+      document.getElementById('scoreGrade').textContent = grade.grade;
+      document.getElementById('scoreGrade').style.color = grade.color;
+      document.getElementById('scoreMessage').textContent = grade.msg;
+
+      // Category scores
+      document.getElementById('categoryScores').innerHTML = result.categories.map(c => `
+        <div class="cat-score-card">
+          <div class="cat-score-header">
+            <span class="cat-score-name">${c.name}</span>
+            <span class="cat-score-value" style="color:${c.color}">${c.score}</span>
+          </div>
+          <div class="cat-score-bar">
+            <div class="cat-score-fill" style="width:${c.score}%;background:${c.color}"></div>
+          </div>
+        </div>
+      `).join('');
+
+      // Feedback
+      const fbList = document.getElementById('feedbackList');
+      fbList.innerHTML = '<h4><i class="fas fa-list-check" style="color:var(--accent-primary)"></i> Detailed Feedback</h4>';
+      result.feedback.forEach(item => {
+        const icon = item.type === 'success' ? 'check' : item.type === 'warning' ? 'exclamation' : 'times';
+        fbList.innerHTML += `
+          <div class="feedback-item ${item.type}">
+            <div class="feedback-icon"><i class="fas fa-${icon}"></i></div>
+            <div class="feedback-text">
+              <div class="feedback-title">${item.title}</div>
+              <div class="feedback-desc">${item.desc}</div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // ─── Main analyze click ────────────────────────────────────────────────────
+    document.getElementById('analyzeBtn').addEventListener('click', () => {
+      const text = document.getElementById('resumeText').value.trim();
+      if (!text) { showToast('⚠️ Please paste your resume text first.'); return; }
+      if (text.length < 50) { showToast('⚠️ Resume text is too short to analyze.'); return; }
+
+      const btn = document.getElementById('analyzeBtn');
+      btn.innerHTML = '<span class="spinner"></span> Analyzing...';
+      btn.disabled = true;
+
+      setTimeout(() => {
+        const result = analyzeResume(text);
+        renderResults(result);
+        btn.innerHTML = '<i class="fas fa-search"></i> Analyze Resume';
+        btn.disabled = false;
+        showToast('✅ Analysis complete!');
+        // Enable match if JD is filled
+        matchBtn.disabled = !jobDescEl.value.trim();
+      }, 1200);
+    });
+
+    // ─── Keyword Match ────────────────────────────────────────────────────────
+    matchBtn.addEventListener('click', () => {
+      const resumeText = document.getElementById('resumeText').value.toLowerCase();
+      const jd = jobDescEl.value.toLowerCase();
+      if (!resumeText || !jd) return;
+
+      // Extract meaningful words from JD (filter stopwords, 4+ chars)
+      const stopwords = new Set(['with','that','this','from','have','will','your','their','they','what','when','where','been','also','more','than','into','about','which','would','other','some','such','then','these','those','were','should','could','must','well']);
+      const jdWords = [...new Set(jd.match(/[a-z]{4,}/g) || [])].filter(w => !stopwords.has(w));
+
+      // Prioritize longer, meaningful words
+      const keywords = jdWords.sort((a, b) => b.length - a.length).slice(0, 40);
+
+      const found = keywords.filter(k => resumeText.includes(k));
+      const missing = keywords.filter(k => !resumeText.includes(k)).slice(0, 20);
+
+      const matchPct = Math.round((found.length / Math.max(1, keywords.length)) * 100);
+
+      document.getElementById('matchStats').textContent = `${found.length} of ${keywords.length} keywords matched (${matchPct}%)`;
+      document.getElementById('foundKeywords').innerHTML = found.slice(0, 20).map(k => `<span class="kw-tag match">${k}</span>`).join('');
+      document.getElementById('missingKeywords').innerHTML = missing.map(k => `<span class="kw-tag missing">${k}</span>`).join('');
+
+      document.getElementById('keywordSection').classList.add('visible');
+      showToast(`🔍 ${matchPct}% keyword match with job description`);
+    });
+  </script>
+</body>
+</html>

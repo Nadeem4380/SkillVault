@@ -15,6 +15,12 @@
                 <i class="fas fa-vault"></i>
                 <h1>SkillVault</h1>
             </div>
+            <nav class="header-nav">
+                <a href="resume-builder.html" class="nav-pill"><i class="fas fa-file-alt"></i> Resume Builder</a>
+                <a href="ats-checker.html" class="nav-pill"><i class="fas fa-robot"></i> ATS Checker</a>
+                <a href="interactive-roadmap.html" class="nav-pill"><i class="fas fa-map-marked-alt"></i> Roadmaps</a>
+                <a href="portfolio.html" class="nav-pill"><i class="fas fa-briefcase"></i> Portfolio</a>
+            </nav>
             <div class="header-actions">
                 <button class="theme-toggle" id="themeToggle">
                     <i class="fas fa-moon"></i>
@@ -140,12 +146,42 @@
                             </button>
                         </div>
                     </div>
+
+                    <div class="card">
+                        <div class="card-content">
+                            <div class="card-icon" style="background: linear-gradient(135deg, #6d28d9, #a78bfa);">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <h2 class="card-heading">Resume Builder</h2>
+                            <p class="card-description">Build a professional resume with 5 premium templates and export as PDF</p>
+                            <button class="build-btn" onclick="window.location.href='resume-builder.html'" style="background: linear-gradient(135deg, #6d28d9, #a78bfa);">
+                                <i class="fas fa-plus"></i>
+                                Create Resume
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-content">
+                            <div class="card-icon" style="background: linear-gradient(135deg, #0891b2, #06b6d4);">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <h2 class="card-heading">ATS Checker</h2>
+                            <p class="card-description">Analyze your resume against ATS criteria and get a compatibility score</p>
+                            <button class="build-btn" onclick="window.location.href='ats-checker.html'" style="background: linear-gradient(135deg, #0891b2, #06b6d4);">
+                                <i class="fas fa-search"></i>
+                                Check Resume
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div class="carousel-indicators">
                 <button class="indicator active" data-slide="0"></button>
                 <button class="indicator" data-slide="1"></button>
+                <button class="indicator" data-slide="2"></button>
+                <button class="indicator" data-slide="3"></button>
             </div>
         </section>
 
@@ -171,6 +207,26 @@
                     <div class="feature-icon"><i class="fas fa-lock"></i></div>
                     <h3>Secure & Private</h3>
                     <p>Your data is encrypted and always private</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-file-alt"></i></div>
+                    <h3>Resume Builder</h3>
+                    <p>Create professional resumes with 5 premium templates</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-robot"></i></div>
+                    <h3>ATS Checker</h3>
+                    <p>Score your resume against ATS compatibility criteria</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-map-marked-alt"></i></div>
+                    <h3>Career Roadmaps</h3>
+                    <p>Step-wise learning paths for 8+ career tracks</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-download"></i></div>
+                    <h3>PDF Export</h3>
+                    <p>Download your resume as a print-ready PDF instantly</p>
                 </div>
             </div>
         </section>

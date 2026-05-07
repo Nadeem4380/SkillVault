@@ -1,0 +1,872 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SkillVault — Interactive Career Roadmaps</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" />
+  <style>
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f7f9fc;
+      --bg-tertiary: #f0f5ff;
+      --border-color: #e6eef9;
+      --text-primary: #0f1724;
+      --text-secondary: #64748b;
+      --accent-primary: #0066ff;
+      --accent-secondary: #00b7ff;
+      --accent-tertiary: rgba(0,102,255,0.08);
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --transition: all 0.2s ease;
+    }
+    :root.dark-theme {
+      --bg-primary: #0b1020;
+      --bg-secondary: #071226;
+      --bg-tertiary: #052033;
+      --border-color: #122039;
+      --text-primary: #e6eef9;
+      --text-secondary: #9fb0c8;
+      --accent-primary: #44a1ff;
+      --accent-secondary: #6ce0ff;
+      --accent-tertiary: rgba(100,160,255,0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg-secondary); color: var(--text-primary); min-height: 100vh; }
+
+    /* Header */
+    .header { background: var(--bg-primary); border-bottom: 1px solid var(--border-color); padding: 1rem 0; position: sticky; top: 0; z-index: 100; }
+    .header-content { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; gap: 1rem; flex-wrap: wrap; }
+    .logo { display: flex; align-items: center; gap: .5rem; text-decoration: none; }
+    .logo i { font-size: 1.4rem; color: var(--accent-primary); }
+    .logo h1 { font-size: 1.3rem; font-weight: 700; background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .header-nav { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
+    .nav-link { padding: .45rem .9rem; border-radius: .5rem; text-decoration: none; font-size: .85rem; font-weight: 600; color: var(--text-secondary); border: 1px solid var(--border-color); background: transparent; cursor: pointer; transition: var(--transition); }
+    .nav-link:hover, .nav-link.active { color: var(--accent-primary); border-color: var(--accent-primary); background: var(--accent-tertiary); }
+    .icon-btn { background: transparent; border: 1px solid var(--border-color); padding: .5rem; border-radius: .5rem; cursor: pointer; color: var(--text-primary); transition: var(--transition); }
+    .icon-btn:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
+
+    /* Main */
+    .main-container { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    /* Hero */
+    .page-hero { text-align: center; margin-bottom: 2.5rem; }
+    .page-hero h2 { font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: .5rem; }
+    .page-hero p { color: var(--text-secondary); font-size: 1rem; }
+
+    /* Track Grid */
+    .track-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .track-card { background: var(--bg-primary); border: 2px solid var(--border-color); border-radius: 1rem; padding: 1.25rem; cursor: pointer; transition: var(--transition); text-align: center; }
+    .track-card:hover { border-color: var(--accent-primary); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,102,255,.12); }
+    .track-card.active { border-color: var(--accent-primary); background: var(--accent-tertiary); }
+    .track-icon { width: 52px; height: 52px; border-radius: 1rem; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto .75rem; }
+    .track-name { font-size: .9rem; font-weight: 700; margin-bottom: .25rem; }
+    .track-desc { font-size: .75rem; color: var(--text-secondary); }
+    .track-progress-bar { height: 4px; background: var(--border-color); border-radius: 2px; margin-top: .75rem; overflow: hidden; }
+    .track-progress-fill { height: 100%; border-radius: 2px; transition: width .6s ease; background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary)); }
+
+    /* Roadmap Detail */
+    .roadmap-detail { display: none; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 1rem; overflow: hidden; }
+    .roadmap-detail.visible { display: block; }
+    .roadmap-detail-header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .roadmap-detail-header h2 { font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; gap: .5rem; }
+    .progress-info { display: flex; align-items: center; gap: 1rem; }
+    .progress-badge { background: var(--accent-tertiary); color: var(--accent-primary); padding: .35rem .75rem; border-radius: 999px; font-size: .8rem; font-weight: 700; }
+    .progress-bar-wrap { display: flex; align-items: center; gap: .75rem; }
+    .progress-bar-container { width: 160px; height: 8px; background: var(--border-color); border-radius: 4px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary)); border-radius: 4px; transition: width .6s ease; }
+    .close-roadmap-btn { background: transparent; border: 1px solid var(--border-color); padding: .4rem .8rem; border-radius: .5rem; cursor: pointer; color: var(--text-secondary); font-size: .85rem; display: flex; align-items: center; gap: .4rem; }
+    .close-roadmap-btn:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
+
+    /* Phases */
+    .phases-container { padding: 1.5rem; }
+    .phase-block { margin-bottom: 1.5rem; border: 1px solid var(--border-color); border-radius: .75rem; overflow: hidden; }
+    .phase-header { padding: 1rem 1.25rem; background: var(--bg-tertiary); display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; transition: var(--transition); }
+    .phase-header:hover { background: var(--accent-tertiary); }
+    .phase-header-left { display: flex; align-items: center; gap: .75rem; }
+    .phase-badge { padding: .3rem .7rem; border-radius: 999px; font-size: .72rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+    .phase-badge.beginner { background: rgba(34,197,94,.15); color: #15803d; }
+    .phase-badge.intermediate { background: rgba(245,158,11,.15); color: #b45309; }
+    .phase-badge.advanced { background: rgba(239,68,68,.15); color: #b91c1c; }
+    :root.dark-theme .phase-badge.beginner { color: #4ade80; }
+    :root.dark-theme .phase-badge.intermediate { color: #fbbf24; }
+    :root.dark-theme .phase-badge.advanced { color: #f87171; }
+    .phase-title { font-weight: 700; font-size: .95rem; }
+    .phase-meta { font-size: .8rem; color: var(--text-secondary); }
+    .phase-chevron { font-size: .9rem; color: var(--text-secondary); transition: transform .2s ease; }
+    .phase-header.expanded .phase-chevron { transform: rotate(180deg); }
+    .phase-progress { font-size: .78rem; color: var(--accent-primary); font-weight: 600; background: var(--accent-tertiary); padding: .2rem .5rem; border-radius: 999px; }
+
+    .phase-content { display: none; padding: 1.25rem; border-top: 1px solid var(--border-color); }
+    .phase-content.open { display: block; }
+
+    /* Skills in phase */
+    .phase-skills { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: 1rem; }
+    .phase-skill-tag { padding: .25rem .6rem; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 999px; font-size: .78rem; font-weight: 600; color: var(--text-secondary); }
+
+    /* Steps */
+    .steps-list { list-style: none; }
+    .step-item { display: flex; align-items: flex-start; gap: .75rem; padding: .75rem; border-radius: .5rem; margin-bottom: .5rem; transition: var(--transition); cursor: pointer; border: 1px solid transparent; }
+    .step-item:hover { background: var(--bg-secondary); border-color: var(--border-color); }
+    .step-item.completed { background: rgba(34,197,94,.06); border-color: rgba(34,197,94,.2); }
+    .step-checkbox { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: var(--transition); background: var(--bg-primary); margin-top: .1rem; }
+    .step-item.completed .step-checkbox { background: var(--success); border-color: var(--success); color: white; }
+    .step-checkbox i { font-size: .65rem; }
+    .step-text { flex: 1; }
+    .step-name { font-size: .88rem; font-weight: 600; margin-bottom: .2rem; }
+    .step-item.completed .step-name { text-decoration: line-through; color: var(--text-secondary); }
+    .step-detail { font-size: .78rem; color: var(--text-secondary); line-height: 1.5; }
+
+    /* Resources */
+    .resources-block { margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--border-color); }
+    .resources-title { font-size: .8rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .06em; margin-bottom: .6rem; }
+    .resource-links { display: flex; flex-wrap: wrap; gap: .4rem; }
+    .resource-link { display: inline-flex; align-items: center; gap: .3rem; padding: .3rem .65rem; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: .4rem; font-size: .78rem; color: var(--text-secondary); text-decoration: none; transition: var(--transition); cursor: pointer; }
+    .resource-link:hover { border-color: var(--accent-primary); color: var(--accent-primary); }
+
+    /* Toast */
+    .toast { position: fixed; right: 1rem; bottom: 1rem; background: rgba(12,20,40,.92); color: #fff; padding: .65rem 1rem; border-radius: .5rem; font-weight: 600; opacity: 0; transform: translateY(8px); transition: opacity .2s, transform .2s; z-index: 9999; pointer-events: none; font-size: .88rem; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* Search */
+    .search-bar { position: relative; max-width: 400px; margin: 0 auto 2rem; }
+    .search-bar input { width: 100%; padding: .75rem 1rem .75rem 2.75rem; border: 1px solid var(--border-color); border-radius: .75rem; background: var(--bg-primary); color: var(--text-primary); font-size: .9rem; transition: var(--transition); }
+    .search-bar input:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0 0 0 3px var(--accent-tertiary); }
+    .search-bar i { position: absolute; left: .9rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
+
+    @media(max-width: 600px) {
+      .track-grid { grid-template-columns: repeat(2, 1fr); }
+      .progress-bar-container { width: 100px; }
+      .page-hero h2 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-content">
+      <a href="index.html" class="logo">
+        <i class="fas fa-vault"></i>
+        <h1>SkillVault</h1>
+      </a>
+      <nav class="header-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="resume-builder.html" class="nav-link">Resume Builder</a>
+        <a href="ats-checker.html" class="nav-link">ATS Checker</a>
+        <a href="interactive-roadmap.html" class="nav-link active">Roadmaps</a>
+        <a href="portfolio.html" class="nav-link">Portfolio</a>
+      </nav>
+      <div>
+        <button id="themeToggle" class="icon-btn" title="Toggle theme"><i class="fas fa-moon"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <div class="page-hero">
+      <h2><i class="fas fa-map-marked-alt"></i> Interactive Career Roadmaps</h2>
+      <p>Choose your career path and follow a step-by-step learning journey. Track your progress as you go.</p>
+    </div>
+
+    <div class="search-bar">
+      <i class="fas fa-search"></i>
+      <input type="text" id="trackSearch" placeholder="Search career tracks..." />
+    </div>
+
+    <div class="track-grid" id="trackGrid">
+      <!-- Rendered by JS -->
+    </div>
+
+    <div class="roadmap-detail" id="roadmapDetail">
+      <div class="roadmap-detail-header">
+        <h2 id="detailTitle"><i class="fas fa-map"></i> Roadmap</h2>
+        <div class="progress-info">
+          <div class="progress-bar-wrap">
+            <span style="font-size:.8rem;color:var(--text-secondary)">Progress:</span>
+            <div class="progress-bar-container">
+              <div class="progress-bar-fill" id="overallProgress" style="width:0%"></div>
+            </div>
+            <span class="progress-badge" id="progressPct">0%</span>
+          </div>
+          <button class="close-roadmap-btn" id="closeRoadmapBtn"><i class="fas fa-times"></i> Close</button>
+        </div>
+      </div>
+      <div class="phases-container" id="phasesContainer">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </main>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    // ─── Theme ─────────────────────────────────────────────────────────────────
+    const themeToggle = document.getElementById('themeToggle');
+    if (localStorage.getItem('skillvault-theme') === 'dark') {
+      document.documentElement.classList.add('dark-theme');
+      themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+    }
+    themeToggle.addEventListener('click', () => {
+      const dark = document.documentElement.classList.toggle('dark-theme');
+      localStorage.setItem('skillvault-theme', dark ? 'dark' : 'light');
+      themeToggle.innerHTML = dark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    });
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // ─── Career Tracks Data ─────────────────────────────────────────────────────
+    const tracks = [
+      {
+        id: 'frontend',
+        name: 'Frontend Dev',
+        desc: 'HTML, CSS, JavaScript, React',
+        icon: 'fas fa-laptop-code',
+        iconBg: '#eff6ff',
+        iconColor: '#2563eb',
+        phases: [
+          {
+            title: 'Web Foundations',
+            level: 'beginner',
+            duration: '2-3 months',
+            skills: ['HTML5', 'CSS3', 'Basic JavaScript', 'Responsive Design', 'Git Basics'],
+            steps: [
+              { name: 'Learn HTML5 structure & semantics', detail: 'Master tags, forms, tables, semantic elements (header, footer, section, article).' },
+              { name: 'CSS fundamentals & layouts', detail: 'Box model, flexbox, grid, media queries, CSS variables, animations.' },
+              { name: 'JavaScript basics', detail: 'Variables, functions, DOM manipulation, events, fetch API, ES6+ syntax.' },
+              { name: 'Git & GitHub basics', detail: 'git init, commit, push, pull, branches, GitHub workflow.' },
+              { name: 'Build 3 static websites', detail: 'Portfolio page, product landing page, survey form.' },
+            ],
+            resources: ['freeCodeCamp', 'MDN Web Docs', 'The Odin Project', 'CSS-Tricks']
+          },
+          {
+            title: 'JavaScript & Tooling',
+            level: 'intermediate',
+            duration: '3-4 months',
+            skills: ['ES6+', 'TypeScript', 'npm/yarn', 'Webpack/Vite', 'Testing Basics'],
+            steps: [
+              { name: 'Advanced JavaScript & ES6+', detail: 'Promises, async/await, closures, prototypes, modules, destructuring.' },
+              { name: 'TypeScript fundamentals', detail: 'Types, interfaces, generics, enums, strict mode.' },
+              { name: 'Package managers & build tools', detail: 'npm, yarn, Vite, Webpack basics, ESLint, Prettier.' },
+              { name: 'Unit testing with Jest', detail: 'Write unit tests, mocking, test-driven development basics.' },
+              { name: 'Build a full JavaScript project', detail: 'Weather app or todo app with API integration.' },
+            ],
+            resources: ['javascript.info', 'TypeScript Handbook', 'Vitejs.dev', 'Jest docs']
+          },
+          {
+            title: 'React & Modern Frontend',
+            level: 'intermediate',
+            duration: '3-4 months',
+            skills: ['React', 'React Router', 'Redux/Zustand', 'REST APIs', 'CSS-in-JS'],
+            steps: [
+              { name: 'React core concepts', detail: 'Components, props, state, hooks (useState, useEffect, useContext, useMemo).' },
+              { name: 'React Router & navigation', detail: 'Nested routes, dynamic routes, navigation guards.' },
+              { name: 'State management', detail: 'Context API, Redux Toolkit, or Zustand.' },
+              { name: 'API integration & data fetching', detail: 'Fetch, Axios, React Query / SWR for server state.' },
+              { name: 'Build a full React app', detail: 'E-commerce frontend or social dashboard with auth.' },
+            ],
+            resources: ['React Docs (react.dev)', 'React Router docs', 'Redux Toolkit', 'Scrimba React course']
+          },
+          {
+            title: 'Advanced & Performance',
+            level: 'advanced',
+            duration: '2-3 months',
+            skills: ['Next.js', 'Performance Optimization', 'Accessibility', 'PWA', 'CI/CD'],
+            steps: [
+              { name: 'Next.js (SSR, SSG, ISR)', detail: 'File-based routing, server components, API routes, image optimization.' },
+              { name: 'Web performance optimization', detail: 'Lighthouse, Core Web Vitals, code splitting, lazy loading, caching.' },
+              { name: 'Accessibility (a11y)', detail: 'ARIA roles, keyboard navigation, screen readers, WCAG guidelines.' },
+              { name: 'Progressive Web Apps', detail: 'Service workers, offline support, web app manifest.' },
+              { name: 'CI/CD for frontend', detail: 'GitHub Actions, Vercel deployments, environment variables.' },
+            ],
+            resources: ['nextjs.org', 'web.dev', 'a11yproject.com', 'Lighthouse CI']
+          }
+        ]
+      },
+      {
+        id: 'backend',
+        name: 'Backend Dev',
+        desc: 'Node.js, APIs, Databases',
+        icon: 'fas fa-server',
+        iconBg: '#f0fdf4',
+        iconColor: '#15803d',
+        phases: [
+          {
+            title: 'Programming Fundamentals',
+            level: 'beginner',
+            duration: '2-3 months',
+            skills: ['JavaScript/Python', 'Data Structures', 'Algorithms', 'OOP', 'Git'],
+            steps: [
+              { name: 'Master a backend language', detail: 'JavaScript (Node.js) or Python — focus on OOP, modules, error handling.' },
+              { name: 'Data structures & algorithms', detail: 'Arrays, linked lists, trees, graphs, sorting, searching algorithms.' },
+              { name: 'Command line & Linux basics', detail: 'Shell commands, file system, processes, SSH, permissions.' },
+              { name: 'Version control with Git', detail: 'Branching, merging, rebasing, pull requests, git flow.' },
+            ],
+            resources: ['CS50', 'freeCodeCamp', 'LeetCode (Easy)', 'The Odin Project (Node)']
+          },
+          {
+            title: 'Web Servers & APIs',
+            level: 'intermediate',
+            duration: '3-4 months',
+            skills: ['Node.js', 'Express.js', 'REST APIs', 'Authentication', 'Validation'],
+            steps: [
+              { name: 'Node.js & Express.js', detail: 'HTTP module, Express routing, middleware, error handling, CORS.' },
+              { name: 'RESTful API design', detail: 'HTTP methods, status codes, REST principles, versioning, documentation.' },
+              { name: 'Authentication & authorization', detail: 'JWT, bcrypt, OAuth2, sessions, role-based access control.' },
+              { name: 'Input validation & security', detail: 'express-validator, helmet, rate limiting, SQL injection prevention.' },
+              { name: 'Build a REST API project', detail: 'Blog or task manager API with full CRUD and auth.' },
+            ],
+            resources: ['Express.js docs', 'JWT.io', 'Postman docs', 'Node best practices']
+          },
+          {
+            title: 'Databases',
+            level: 'intermediate',
+            duration: '2-3 months',
+            skills: ['SQL', 'PostgreSQL', 'MongoDB', 'Redis', 'ORMs'],
+            steps: [
+              { name: 'SQL fundamentals', detail: 'SELECT, JOINs, aggregations, indexes, transactions, normalization.' },
+              { name: 'PostgreSQL in depth', detail: 'Schemas, constraints, stored procedures, pg library for Node.' },
+              { name: 'NoSQL with MongoDB', detail: 'Documents, collections, Mongoose ODM, aggregation pipeline.' },
+              { name: 'Caching with Redis', detail: 'Key-value storage, session caching, pub/sub, TTL.' },
+              { name: 'ORM / Query builders', detail: 'Sequelize, Prisma, or TypeORM for database abstraction.' },
+            ],
+            resources: ['PostgreSQL Tutorial', 'MongoDB University', 'Redis docs', 'Prisma docs']
+          },
+          {
+            title: 'Advanced Backend',
+            level: 'advanced',
+            duration: '3-4 months',
+            skills: ['Microservices', 'Docker', 'Message Queues', 'GraphQL', 'System Design'],
+            steps: [
+              { name: 'Docker & containerization', detail: 'Dockerfile, docker-compose, volumes, networking, multi-stage builds.' },
+              { name: 'Microservices architecture', detail: 'Service decomposition, API gateway, service discovery, inter-service communication.' },
+              { name: 'Message queues', detail: 'RabbitMQ or Apache Kafka for async messaging and event-driven architecture.' },
+              { name: 'GraphQL API design', detail: 'Schema definition, resolvers, Apollo Server, subscriptions.' },
+              { name: 'System design basics', detail: 'Load balancing, caching strategies, CAP theorem, scalability patterns.' },
+            ],
+            resources: ['Docker docs', 'System Design Primer', 'Apollo GraphQL', 'Microservices.io']
+          }
+        ]
+      },
+      {
+        id: 'fullstack',
+        name: 'Full Stack',
+        desc: 'Frontend + Backend + DB',
+        icon: 'fas fa-layer-group',
+        iconBg: '#faf5ff',
+        iconColor: '#7c3aed',
+        phases: [
+          {
+            title: 'Core Web Skills',
+            level: 'beginner',
+            duration: '2-3 months',
+            skills: ['HTML', 'CSS', 'JavaScript', 'Git', 'Command Line'],
+            steps: [
+              { name: 'HTML & CSS mastery', detail: 'Semantic HTML, CSS layout (flex/grid), responsive design, CSS animations.' },
+              { name: 'JavaScript fundamentals', detail: 'Core JS, DOM, events, fetch API, ES6+ features.' },
+              { name: 'Command line & Git', detail: 'Terminal navigation, Git workflow, GitHub collaboration.' },
+            ],
+            resources: ['The Odin Project', 'freeCodeCamp', 'javascript.info']
+          },
+          {
+            title: 'React + Node.js Stack',
+            level: 'intermediate',
+            duration: '4-5 months',
+            skills: ['React', 'Node.js', 'Express', 'MongoDB', 'REST APIs'],
+            steps: [
+              { name: 'React (MERN frontend)', detail: 'Components, hooks, context, routing, state management.' },
+              { name: 'Node.js & Express API', detail: 'REST API, middleware, auth with JWT, file uploads.' },
+              { name: 'MongoDB with Mongoose', detail: 'Schema design, CRUD operations, relationships, population.' },
+              { name: 'Connect frontend to backend', detail: 'Axios/fetch, CORS handling, environment variables, proxy.' },
+              { name: 'Build a MERN project', detail: 'Full MERN app: auth system, CRUD dashboard, file upload.' },
+            ],
+            resources: ['MERN Stack Course', 'MongoDB docs', 'React docs', 'Express.js docs']
+          },
+          {
+            title: 'TypeScript & Testing',
+            level: 'intermediate',
+            duration: '2-3 months',
+            skills: ['TypeScript', 'Jest', 'React Testing Library', 'Cypress', 'CI/CD'],
+            steps: [
+              { name: 'TypeScript across the stack', detail: 'Types for both React components and Express APIs, shared types.' },
+              { name: 'Frontend testing', detail: 'React Testing Library, component tests, integration tests.' },
+              { name: 'Backend testing', detail: 'Jest, supertest for API endpoint testing, mocking databases.' },
+              { name: 'E2E testing with Cypress', detail: 'User flow testing, fixtures, CI integration.' },
+            ],
+            resources: ['TypeScript docs', 'Testing Library docs', 'Cypress docs', 'Vitest']
+          },
+          {
+            title: 'Deployment & DevOps',
+            level: 'advanced',
+            duration: '2-3 months',
+            skills: ['Docker', 'CI/CD', 'Cloud Hosting', 'Monitoring', 'Security'],
+            steps: [
+              { name: 'Docker & Docker Compose', detail: 'Containerize frontend, backend, and database together.' },
+              { name: 'Deploy to cloud', detail: 'Vercel (frontend), Railway/Render (backend), MongoDB Atlas.' },
+              { name: 'CI/CD with GitHub Actions', detail: 'Automated tests, builds, and deployments on push.' },
+              { name: 'Monitoring & error tracking', detail: 'Sentry, Datadog basics, health checks, logging.' },
+            ],
+            resources: ['Docker docs', 'Vercel docs', 'GitHub Actions docs', 'Sentry docs']
+          }
+        ]
+      },
+      {
+        id: 'datascience',
+        name: 'Data Science',
+        desc: 'Python, ML, Statistics',
+        icon: 'fas fa-chart-bar',
+        iconBg: '#fff7ed',
+        iconColor: '#c2410c',
+        phases: [
+          {
+            title: 'Python & Statistics',
+            level: 'beginner',
+            duration: '2-3 months',
+            skills: ['Python', 'NumPy', 'Pandas', 'Statistics', 'Data Visualization'],
+            steps: [
+              { name: 'Python for data science', detail: 'Python syntax, functions, OOP, file I/O, comprehensions.' },
+              { name: 'NumPy & Pandas', detail: 'Arrays, DataFrames, data cleaning, filtering, aggregation.' },
+              { name: 'Statistics fundamentals', detail: 'Mean, variance, distributions, hypothesis testing, p-values.' },
+              { name: 'Data visualization', detail: 'Matplotlib, Seaborn, Plotly for charts and dashboards.' },
+            ],
+            resources: ['Kaggle Learn', 'Python for Data Analysis (book)', 'Khan Academy Statistics', 'Plotly docs']
+          },
+          {
+            title: 'Machine Learning Basics',
+            level: 'intermediate',
+            duration: '3-4 months',
+            skills: ['Scikit-learn', 'Regression', 'Classification', 'Clustering', 'Model Evaluation'],
+            steps: [
+              { name: 'Supervised learning', detail: 'Linear/logistic regression, decision trees, SVM, K-NN.' },
+              { name: 'Unsupervised learning', detail: 'K-means clustering, PCA, dimensionality reduction.' },
+              { name: 'Model evaluation & tuning', detail: 'Cross-validation, confusion matrix, ROC-AUC, GridSearchCV.' },
+              { name: 'Feature engineering', detail: 'Encoding, scaling, handling missing values, feature selection.' },
+              { name: 'Complete ML project on Kaggle', detail: 'Titanic, House Prices, or a personal dataset project.' },
+            ],
+            resources: ['Scikit-learn docs', 'Hands-on ML (book)', 'Kaggle competitions', 'fast.ai']
+          },
+          {
+            title: 'Deep Learning',
+            level: 'advanced',
+            duration: '3-4 months',
+            skills: ['TensorFlow', 'PyTorch', 'Neural Networks', 'CNNs', 'NLP Basics'],
+            steps: [
+              { name: 'Neural network fundamentals', detail: 'Perceptrons, activation functions, backpropagation, gradient descent.' },
+              { name: 'PyTorch or TensorFlow', detail: 'Tensors, autograd, dataset loading, training loops, GPU usage.' },
+              { name: 'Computer Vision (CNNs)', detail: 'Conv layers, pooling, transfer learning, image classification.' },
+              { name: 'NLP basics', detail: 'Tokenization, embeddings, RNNs, transformers intro.' },
+              { name: 'Deploy an ML model', detail: 'FastAPI or Flask for model serving, Docker, cloud deployment.' },
+            ],
+            resources: ['PyTorch docs', 'fast.ai course', 'deeplearning.ai', 'Papers With Code']
+          }
+        ]
+      },
+      {
+        id: 'devops',
+        name: 'DevOps',
+        desc: 'CI/CD, Cloud, Automation',
+        icon: 'fas fa-infinity',
+        iconBg: '#ecfeff',
+        iconColor: '#0891b2',
+        phases: [
+          {
+            title: 'Linux & Networking',
+            level: 'beginner',
+            duration: '2-3 months',
+            skills: ['Linux', 'Shell Scripting', 'Networking', 'SSH', 'DNS/HTTP'],
+            steps: [
+              { name: 'Linux command line mastery', detail: 'File system, processes, permissions, systemd, package managers.' },
+              { name: 'Shell scripting (Bash)', detail: 'Variables, loops, conditionals, functions, cron jobs.' },
+              { name: 'Networking fundamentals', detail: 'TCP/IP, DNS, HTTP/S, firewalls, VPNs, load balancers.' },
+              { name: 'SSH & security basics', detail: 'SSH keys, certificates, firewall rules, user management.' },
+            ],
+            resources: ['Linux Journey', 'The Linux Command Line (book)', 'Cisco Networking Basics', 'OverTheWire (Bandit)']
+          },
+          {
+            title: 'Containers & CI/CD',
+            level: 'intermediate',
+            duration: '3-4 months',
+            skills: ['Docker', 'Docker Compose', 'GitHub Actions', 'Jenkins', 'Artifact Registries'],
+            steps: [
+              { name: 'Docker fundamentals', detail: 'Images, containers, Dockerfile, multi-stage builds, networking, volumes.' },
+              { name: 'Docker Compose', detail: 'Multi-container apps, service dependencies, environment variables.' },
+              { name: 'CI/CD pipelines', detail: 'GitHub Actions or GitLab CI — build, test, deploy pipelines.' },
+              { name: 'Container registries', detail: 'Docker Hub, GitHub Container Registry, ECR, artifact management.' },
+            ],
+            resources: ['Docker docs', 'GitHub Actions docs', 'GitLab CI/CD', 'Argo CD']
+          },
+          {
+            title: 'Cloud & Kubernetes',
+            level: 'intermediate',
+            duration: '3-4 months',
+            skills: ['AWS/GCP/Azure', 'Kubernetes', 'Terraform', 'IAM', 'VPC'],
+            steps: [
+              { name: 'Cloud fundamentals (AWS recommended)', detail: 'EC2, S3, RDS, Lambda, VPC, IAM — aim for AWS SAA.' },
+              { name: 'Kubernetes basics', detail: 'Pods, deployments, services, ingress, configmaps, RBAC.' },
+              { name: 'Infrastructure as Code', detail: 'Terraform for provisioning AWS/GCP resources, modules, state management.' },
+              { name: 'Secrets & config management', detail: 'AWS Secrets Manager, Vault by HashiCorp, Kubernetes Secrets.' },
+            ],
+            resources: ['AWS Free Tier', 'Kubernetes.io', 'Terraform Learn', 'A Cloud Guru']
+          },
+          {
+            title: 'Observability & SRE',
+            level: 'advanced',
+            duration: '2-3 months',
+            skills: ['Prometheus', 'Grafana', 'Logging', 'Alerting', 'SLIs/SLOs'],
+            steps: [
+              { name: 'Metrics with Prometheus', detail: 'Scraping, exporters, PromQL queries, alerting rules.' },
+              { name: 'Dashboards with Grafana', detail: 'Data sources, panels, variables, alert notifications.' },
+              { name: 'Centralized logging', detail: 'ELK Stack (Elasticsearch, Logstash, Kibana) or Loki + Grafana.' },
+              { name: 'SRE principles', detail: 'SLIs, SLOs, error budgets, incident management, post-mortems.' },
+            ],
+            resources: ['Prometheus docs', 'Grafana docs', 'Google SRE Book', 'OpenTelemetry']
+          }
+        ]
+      },
+      {
+        id: 'cybersecurity',
+        name: 'Cybersecurity',
+        desc: 'Security, Ethical Hacking',
+        icon: 'fas fa-shield-alt',
+        iconBg: '#fff1f2',
+        iconColor: '#be123c',
+        phases: [
+          {
+            title: 'Security Foundations',
+            level: 'beginner',
+            duration: '2-3 months',
+            skills: ['Networking', 'Linux', 'Cryptography', 'CIA Triad', 'Security Models'],
+            steps: [
+              { name: 'Networking & protocols', detail: 'OSI model, TCP/IP, DNS, HTTP/S, ARP, DHCP, Wireshark.' },
+              { name: 'Linux security basics', detail: 'Permissions, users, firewall (iptables/ufw), logs, hardening.' },
+              { name: 'Cryptography fundamentals', detail: 'Symmetric/asymmetric encryption, hashing, PKI, TLS/SSL.' },
+              { name: 'Security frameworks', detail: 'CIA triad, OWASP Top 10, NIST framework, threat modeling.' },
+            ],
+            resources: ['TryHackMe (Pre-Security)', 'CompTIA Security+ Study', 'Cryptography I (Coursera)', 'OWASP.org']
+          },
+          {
+            title: 'Ethical Hacking',
+            level: 'intermediate',
+            duration: '4-5 months',
+            skills: ['Kali Linux', 'Nmap', 'Metasploit', 'Burp Suite', 'Vulnerability Scanning'],
+            steps: [
+              { name: 'Kali Linux & tools', detail: 'Setup, nmap, netcat, wireshark, gobuster, hydra.' },
+              { name: 'Web application pentesting', detail: 'OWASP Top 10 attacks, Burp Suite, SQLi, XSS, CSRF, IDOR.' },
+              { name: 'Network pentesting', detail: 'Network enumeration, sniffing, MITM, password attacks.' },
+              { name: 'Exploitation & post-exploitation', detail: 'Metasploit, Meterpreter, privilege escalation, persistence.' },
+              { name: 'CTF challenges', detail: 'Participate in 10+ CTF challenges on HackTheBox or TryHackMe.' },
+            ],
+            resources: ['TryHackMe', 'HackTheBox', 'PortSwigger Web Security Academy', 'TCM Security']
+          },
+          {
+            title: 'Certifications & Specialization',
+            level: 'advanced',
+            duration: '3-4 months',
+            skills: ['CEH', 'OSCP', 'Incident Response', 'Forensics', 'Threat Intelligence'],
+            steps: [
+              { name: 'CompTIA Security+ / CEH', detail: 'Prepare for and pass Security+ or CEH certification.' },
+              { name: 'OSCP preparation', detail: 'PWK course, Offensive Security labs, buffer overflow, report writing.' },
+              { name: 'Digital forensics basics', detail: 'File carving, memory analysis, log analysis, chain of custody.' },
+              { name: 'Incident response', detail: 'IR lifecycle, threat hunting, SIEM (Splunk/ELK), IOC analysis.' },
+            ],
+            resources: ['Offensive Security (OffSec)', 'CompTIA CertMaster', 'SANS courses', 'Splunk free training']
+          }
+        ]
+      },
+      {
+        id: 'uiux',
+        name: 'UI/UX Design',
+        desc: 'Design, Prototyping, Research',
+        icon: 'fas fa-pen-nib',
+        iconBg: '#fdf4ff',
+        iconColor: '#a21caf',
+        phases: [
+          {
+            title: 'Design Fundamentals',
+            level: 'beginner',
+            duration: '2-3 months',
+            skills: ['Design Principles', 'Color Theory', 'Typography', 'Layout', 'Figma Basics'],
+            steps: [
+              { name: 'Design principles', detail: 'Balance, alignment, contrast, proximity, repetition, whitespace.' },
+              { name: 'Color theory & typography', detail: 'Color wheels, palettes, font pairing, hierarchy, readability.' },
+              { name: 'Figma essentials', detail: 'Frames, components, auto-layout, constraints, styles, prototyping.' },
+              { name: 'UX laws & heuristics', detail: 'Fitts Law, Hicks Law, Nielson Heuristics, cognitive load.' },
+            ],
+            resources: ['Figma Learn', 'Refactoring UI (book)', 'Google UX Design Certificate', 'Dribbble for inspiration']
+          },
+          {
+            title: 'UX Research & Process',
+            level: 'intermediate',
+            duration: '3-4 months',
+            skills: ['User Research', 'Wireframing', 'User Testing', 'Information Architecture', 'Design Systems'],
+            steps: [
+              { name: 'User research methods', detail: 'Interviews, surveys, usability testing, card sorting, A/B testing.' },
+              { name: 'Wireframing & prototyping', detail: 'Low-fi sketches, mid-fi wireframes, high-fi interactive prototypes.' },
+              { name: 'Information architecture', detail: 'Sitemaps, user flows, navigation patterns, mental models.' },
+              { name: 'Design systems', detail: 'Component libraries, tokens, documentation, accessibility in design.' },
+              { name: 'Complete 3 UX case studies', detail: 'End-to-end: research → design → prototype → test → iterate.' },
+            ],
+            resources: ['Nielsen Norman Group', 'NN/g UX Certification', 'UX Collective', 'Maze user testing']
+          },
+          {
+            title: 'Advanced & Handoff',
+            level: 'advanced',
+            duration: '2-3 months',
+            skills: ['Motion Design', 'Dev Handoff', 'Design Ops', 'Figma Advanced', 'Portfolio'],
+            steps: [
+              { name: 'Motion & micro-interactions', detail: 'Transition design, animation principles, Lottie, Figma smart animate.' },
+              { name: 'Developer handoff', detail: 'Figma inspect, design tokens, redlines, component specs.' },
+              { name: 'Build your design portfolio', detail: 'Showcase 3-5 case studies with problem → solution → outcome.' },
+              { name: 'Advanced Figma', detail: 'Variables, conditional prototyping, plugins, component properties.' },
+            ],
+            resources: ['Figma Advanced tutorials', 'Zeroheight (design tokens)', 'Uxfolio portfolio builder', 'Lottiefiles']
+          }
+        ]
+      },
+      {
+        id: 'cloud',
+        name: 'Cloud Architecture',
+        desc: 'AWS, GCP, Azure',
+        icon: 'fas fa-cloud',
+        iconBg: '#f0f9ff',
+        iconColor: '#0369a1',
+        phases: [
+          {
+            title: 'Cloud Foundations',
+            level: 'beginner',
+            duration: '2-3 months',
+            skills: ['Cloud Concepts', 'AWS Core Services', 'IAM', 'Networking', 'Storage'],
+            steps: [
+              { name: 'Cloud computing concepts', detail: 'IaaS, PaaS, SaaS, shared responsibility model, cloud economics.' },
+              { name: 'AWS core services', detail: 'EC2, S3, RDS, Lambda, CloudFront, Route 53, CloudWatch.' },
+              { name: 'IAM & security', detail: 'Users, roles, policies, MFA, least privilege principle.' },
+              { name: 'VPC & networking', detail: 'Subnets, security groups, NACLs, VPN, Direct Connect, NAT Gateway.' },
+              { name: 'Pass AWS Cloud Practitioner', detail: 'CLF-C02 certification — validates foundational cloud knowledge.' },
+            ],
+            resources: ['AWS Skill Builder', 'Cloud Practitioner Essentials', 'A Cloud Guru', 'Tutorials Dojo practice exams']
+          },
+          {
+            title: 'Solutions Architecture',
+            level: 'intermediate',
+            duration: '3-4 months',
+            skills: ['High Availability', 'Auto Scaling', 'Databases', 'Serverless', 'Cost Optimization'],
+            steps: [
+              { name: 'High availability & fault tolerance', detail: 'Multi-AZ, load balancers (ALB/NLB), failover, health checks.' },
+              { name: 'Auto Scaling & EC2 management', detail: 'Launch templates, ASG, scheduled scaling, capacity planning.' },
+              { name: 'Database services', detail: 'RDS Multi-AZ, Aurora, DynamoDB, ElastiCache, migration strategies.' },
+              { name: 'Serverless architecture', detail: 'Lambda, API Gateway, Step Functions, EventBridge, SQS/SNS.' },
+              { name: 'Pass AWS Solutions Architect Associate', detail: 'SAA-C03 — one of the most recognized cloud certifications.' },
+            ],
+            resources: ['SAA-C03 Study Guide', 'Adrian Cantrill course', 'Stephane Maarek (Udemy)', 'AWS Well-Architected Framework']
+          },
+          {
+            title: 'Advanced Architecture',
+            level: 'advanced',
+            duration: '3-4 months',
+            skills: ['Terraform', 'Kubernetes on EKS', 'Cost Management', 'Security', 'Multi-cloud'],
+            steps: [
+              { name: 'Infrastructure as Code (Terraform)', detail: 'Providers, resources, modules, remote state, Terragrunt.' },
+              { name: 'Kubernetes on AWS (EKS)', detail: 'Managed node groups, IRSA, EBS/EFS CSI, cluster autoscaler.' },
+              { name: 'FinOps & cost optimization', detail: 'Cost Explorer, Reserved Instances, Savings Plans, rightsizing.' },
+              { name: 'Advanced security', detail: 'AWS Security Hub, GuardDuty, Inspector, Macie, Config rules.' },
+              { name: 'AWS Solutions Architect Professional', detail: 'SAP-C02 — expert level, complex enterprise architectures.' },
+            ],
+            resources: ['Terraform AWS Provider docs', 'EKS Workshop', 'AWS re:Invent talks', 'FinOps Foundation']
+          }
+        ]
+      }
+    ];
+
+    // ─── Progress storage ────────────────────────────────────────────────────────
+    function loadProgress() {
+      return JSON.parse(localStorage.getItem('sv-roadmap-progress') || '{}');
+    }
+    function saveProgress(progress) {
+      localStorage.setItem('sv-roadmap-progress', JSON.stringify(progress));
+    }
+
+    function getTrackProgress(trackId) {
+      const progress = loadProgress();
+      const track = tracks.find(t => t.id === trackId);
+      if (!track) return 0;
+      const totalSteps = track.phases.reduce((sum, p) => sum + p.steps.length, 0);
+      const completed = track.phases.reduce((sum, p, pi) =>
+        sum + p.steps.filter((_, si) => progress[`${trackId}_${pi}_${si}`]).length, 0
+      );
+      return totalSteps > 0 ? Math.round((completed / totalSteps) * 100) : 0;
+    }
+
+    function isStepDone(trackId, phaseIdx, stepIdx) {
+      const progress = loadProgress();
+      return !!progress[`${trackId}_${phaseIdx}_${stepIdx}`];
+    }
+
+    function toggleStep(trackId, phaseIdx, stepIdx) {
+      const progress = loadProgress();
+      const key = `${trackId}_${phaseIdx}_${stepIdx}`;
+      progress[key] = !progress[key];
+      saveProgress(progress);
+    }
+
+    // ─── Render track grid ───────────────────────────────────────────────────────
+    let currentTrackId = null;
+
+    function renderTrackGrid(filter = '') {
+      const grid = document.getElementById('trackGrid');
+      const filtered = tracks.filter(t =>
+        t.name.toLowerCase().includes(filter.toLowerCase()) ||
+        t.desc.toLowerCase().includes(filter.toLowerCase())
+      );
+      grid.innerHTML = filtered.map(track => {
+        const pct = getTrackProgress(track.id);
+        return `
+          <div class="track-card ${currentTrackId === track.id ? 'active' : ''}" data-id="${track.id}">
+            <div class="track-icon" style="background:${track.iconBg}">
+              <i class="${track.icon}" style="color:${track.iconColor}"></i>
+            </div>
+            <div class="track-name">${track.name}</div>
+            <div class="track-desc">${track.desc}</div>
+            <div class="track-progress-bar">
+              <div class="track-progress-fill" style="width:${pct}%"></div>
+            </div>
+            <div style="text-align:center;font-size:.72rem;color:var(--text-secondary);margin-top:.3rem">${pct}% complete</div>
+          </div>
+        `;
+      }).join('');
+
+      grid.querySelectorAll('.track-card').forEach(card => {
+        card.addEventListener('click', () => openTrack(card.dataset.id));
+      });
+    }
+
+    // ─── Open a track ────────────────────────────────────────────────────────────
+    function openTrack(trackId) {
+      currentTrackId = trackId;
+      const track = tracks.find(t => t.id === trackId);
+      if (!track) return;
+
+      renderTrackGrid();
+
+      const detail = document.getElementById('roadmapDetail');
+      detail.classList.add('visible');
+      document.getElementById('detailTitle').innerHTML = `<i class="${track.icon}" style="color:${track.iconColor}"></i> ${track.name} Roadmap`;
+
+      renderPhases(track);
+      updateOverallProgress(track);
+
+      detail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function updateOverallProgress(track) {
+      const pct = getTrackProgress(track.id);
+      document.getElementById('overallProgress').style.width = `${pct}%`;
+      document.getElementById('progressPct').textContent = `${pct}%`;
+    }
+
+    function renderPhases(track) {
+      const container = document.getElementById('phasesContainer');
+      container.innerHTML = track.phases.map((phase, pi) => {
+        const totalSteps = phase.steps.length;
+        const completedSteps = phase.steps.filter((_, si) => isStepDone(track.id, pi, si)).length;
+        const phaseCompletion = `${completedSteps}/${totalSteps}`;
+        const isFirst = pi === 0;
+
+        return `
+          <div class="phase-block">
+            <div class="phase-header ${isFirst ? 'expanded' : ''}" data-phase="${pi}">
+              <div class="phase-header-left">
+                <span class="phase-badge ${phase.level}">${phase.level}</span>
+                <div>
+                  <div class="phase-title">${phase.title}</div>
+                  <div class="phase-meta"><i class="fas fa-clock"></i> ${phase.duration}</div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:.75rem">
+                <span class="phase-progress">${phaseCompletion} done</span>
+                <i class="fas fa-chevron-down phase-chevron ${isFirst ? '' : 'rotated'}"></i>
+              </div>
+            </div>
+            <div class="phase-content ${isFirst ? 'open' : ''}" data-phase-content="${pi}">
+              <div class="phase-skills">${phase.skills.map(s => `<span class="phase-skill-tag">${s}</span>`).join('')}</div>
+              <ul class="steps-list">
+                ${phase.steps.map((step, si) => `
+                  <li class="step-item ${isStepDone(track.id, pi, si) ? 'completed' : ''}" data-phase="${pi}" data-step="${si}">
+                    <div class="step-checkbox">
+                      ${isStepDone(track.id, pi, si) ? '<i class="fas fa-check"></i>' : ''}
+                    </div>
+                    <div class="step-text">
+                      <div class="step-name">${step.name}</div>
+                      <div class="step-detail">${step.detail}</div>
+                    </div>
+                  </li>
+                `).join('')}
+              </ul>
+              <div class="resources-block">
+                <div class="resources-title"><i class="fas fa-book-open"></i> Recommended Resources</div>
+                <div class="resource-links">
+                  ${phase.resources.map(r => `<span class="resource-link"><i class="fas fa-external-link-alt"></i> ${r}</span>`).join('')}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Phase toggle
+      container.querySelectorAll('.phase-header').forEach(header => {
+        header.addEventListener('click', () => {
+          const pi = header.dataset.phase;
+          const content = container.querySelector(`[data-phase-content="${pi}"]`);
+          const chevron = header.querySelector('.phase-chevron');
+          const isOpen = content.classList.contains('open');
+          content.classList.toggle('open', !isOpen);
+          header.classList.toggle('expanded', !isOpen);
+        });
+      });
+
+      // Step toggle
+      container.querySelectorAll('.step-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const pi = parseInt(item.dataset.phase);
+          const si = parseInt(item.dataset.step);
+          toggleStep(track.id, pi, si);
+          const done = isStepDone(track.id, pi, si);
+          item.classList.toggle('completed', done);
+          const checkbox = item.querySelector('.step-checkbox');
+          checkbox.innerHTML = done ? '<i class="fas fa-check"></i>' : '';
+          updatePhaseProgress(track, pi);
+          updateOverallProgress(track);
+          renderTrackGrid();
+          showToast(done ? '✅ Step completed!' : '↩️ Step marked incomplete');
+        });
+      });
+    }
+
+    function updatePhaseProgress(track, pi) {
+      const phase = track.phases[pi];
+      const completed = phase.steps.filter((_, si) => isStepDone(track.id, pi, si)).length;
+      const progressEl = document.querySelector(`.phase-header[data-phase="${pi}"] .phase-progress`);
+      if (progressEl) progressEl.textContent = `${completed}/${phase.steps.length} done`;
+    }
+
+    // Close roadmap
+    document.getElementById('closeRoadmapBtn').addEventListener('click', () => {
+      document.getElementById('roadmapDetail').classList.remove('visible');
+      currentTrackId = null;
+      renderTrackGrid();
+    });
+
+    // Search
+    document.getElementById('trackSearch').addEventListener('input', e => {
+      renderTrackGrid(e.target.value);
+    });
+
+    // ─── Init ────────────────────────────────────────────────────────────────────
+    renderTrackGrid();
+  </script>
+</body>
+</html>
