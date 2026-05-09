@@ -3,13 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>SkillVault - Career Roadmap (theme-fixed modal)</title>
-
-  <!-- Font Awesome for icons -->
+  <title>SkillVault - Career Roadmap</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" />
-
   <style>
-    /* Default theme variables so the file is self-contained */
     :root{
       --bg-primary: #ffffff;
       --bg-secondary: #f7f9fc;
@@ -23,7 +19,7 @@
       --transition: all 0.18s ease;
       --modal-z: 1200;
     }
-    :root.dark-theme{
+    html.dark-theme{
       --bg-primary: #0b1020;
       --bg-secondary: #071226;
       --bg-tertiary: #052033;
@@ -34,135 +30,69 @@
       --accent-secondary: #6ce0ff;
       --accent-tertiary: rgba(100,160,255,0.08);
     }
-
-    *{box-sizing:border-box}
     body{
-      margin:0;
-      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background:var(--bg-secondary);
-      color:var(--text-primary);
-    }
-
+      margin:0; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background:var(--bg-secondary); color:var(--text-primary);transition:var(--transition);}
+    
     /* Header */
-    .header{padding:1rem 0}
+    .header{padding:1rem 0;background-color:var(--bg-secondary);border-bottom:1px solid var(--border-color);position:sticky;top:0;z-index:1000;}
     .header-content{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 1rem}
     .logo{display:flex;align-items:center;gap:.5rem}
     .logo i{font-size:1.45rem;color:var(--accent-primary)}
+    .logo h1{margin:0;font-size:1.75rem;font-weight:700;background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
     .header-actions{display:flex;gap:.5rem}
-    .header-actions button{background:transparent;border:1px solid var(--border-color);padding:.5rem;border-radius:.5rem;cursor:pointer;color:var(--text-primary)}
-
+    .header-actions button{background:transparent;border:1px solid var(--border-color);padding:.5rem;border-radius:.5rem;cursor:pointer;color:var(--text-primary);transition:var(--transition);font-size:1.125rem;display:flex;align-items:center;justify-content:center;width:2.5rem;height:2.5rem}
+    .header-actions button:hover{background:var(--bg-tertiary);color:var(--accent-primary)}
+    
     .main-container{max-width:1100px;margin:2rem auto;padding:0 1rem 4rem}
-
-    /* Roadmap header */
-    .roadmap-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:3rem; padding-bottom:2rem; border-bottom:2px solid var(--border-color); }
-    .back-btn { display:flex; align-items:center; gap:0.5rem; padding:0.75rem 1.5rem; background-color:var(--bg-secondary); border:1px solid var(--border-color); border-radius:0.5rem; text-decoration:none; color:var(--text-primary) }
-    .roadmap-header h2 { font-size:2rem; font-weight:700; background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; text-align:center; flex:1 }
-
-    /* basic sections */
-    .timeline-section,.skills-section,.resources-section{background:var(--bg-primary);border:1px solid var(--border-color);border-radius:1rem;padding:2rem}
+    .roadmap-header {display:flex;justify-content:space-between;align-items:center;margin-bottom:3rem;padding-bottom:2rem;border-bottom:2px solid var(--border-color);}
+    .back-btn {display:flex;align-items:center;gap:0.5rem;padding:0.75rem 1.5rem;background-color:var(--bg-secondary);border:1px solid var(--border-color);border-radius:0.5rem;text-decoration:none;color:var(--text-primary);transition:var(--transition);cursor:pointer}
+    .back-btn:hover{background-color:var(--bg-tertiary)}
+    .roadmap-header h2 {font-size:2rem;font-weight:700;background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;flex:1;margin:0}
+    .timeline-section,.skills-section,.resources-section{background:var(--bg-primary);border:1px solid var(--border-color);border-radius:1rem;padding:2rem;margin-bottom:2rem;}
     .section-title{font-size:1.25rem;font-weight:700;margin-bottom:1rem;color:var(--text-primary)}
-    .timeline{position:relative}
-    .timeline::before{content:'';position:absolute;left:1.5rem;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--accent-primary),var(--accent-secondary))}
-    .timeline-item{margin-bottom:1.25rem;padding-left:5rem;position:relative}
-    .timeline-item::before{content:'';position:absolute;left:.75rem;top:.5rem;width:1.2rem;height:1.2rem;background:var(--bg-primary);border:3px solid var(--accent-primary);border-radius:50%;box-shadow:0 0 0 4px var(--bg-secondary)}
+    .timeline{position:relative;}
+    .timeline-item{margin-bottom:1.25rem;position:relative;}
     .timeline-content{background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:.75rem;padding:1rem}
-    .timeline-month{font-size:.8rem;color:var(--accent-primary);font-weight:600;text-transform:uppercase;margin-bottom:.25rem}
-    .timeline-title{font-weight:700;margin-bottom:.5rem;color:var(--text-primary)}
-    .timeline-description{color:var(--text-secondary);font-size:.9rem;margin-bottom:.5rem}
-    .timeline-topic{background:var(--accent-tertiary);color:var(--accent-primary);padding:.25rem .5rem;border-radius:999px;font-weight:600;font-size:.75rem;margin-right:.4rem}
-
-    .skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem}
-    .skill-card{background:var(--bg-secondary);padding:1rem;border:1px solid var(--border-color);border-radius:.75rem;text-align:center}
-    .skill-icon{font-size:1.7rem;color:var(--accent-primary);margin-bottom:.5rem}
+    .timeline-month{font-size:.9rem;color:var(--accent-primary);font-weight:600;text-transform:uppercase;margin-bottom:.25rem}
+    .timeline-title{font-weight:700;margin-bottom:.5rem;color:var(--text-primary);font-size:1.09rem;}
+    .timeline-description{color:var(--text-secondary);font-size:.96rem;margin-bottom:.5rem}
+    .timeline-topic{background:var(--accent-tertiary);color:var(--accent-primary);padding:.24rem .5rem;border-radius:999px;font-weight:600;font-size:.82rem;margin:2px;display:inline-block}
+    .skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;}
+    .skill-card{background:var(--bg-secondary);padding:1rem;border:1px solid var(--border-color);border-radius:.75rem;text-align:center;transition:var(--transition)}
+    .skill-card:hover{border-color:var(--accent-primary);background:var(--bg-tertiary)}
+    .skill-icon{font-size:1.7rem;color:var(--accent-primary);margin-bottom:.55rem;}
     .skill-name{font-weight:700;color:var(--text-primary)}
-    .skill-level{color:var(--text-secondary);font-size:.85rem;margin-bottom:.5rem}
-    .skill-progress{height:6px;background:var(--border-color);border-radius:3px;overflow:hidden}
-    .skill-progress-bar{height:100%;background:linear-gradient(90deg,var(--accent-primary),var(--accent-secondary));width:0;animation:progressFill .9s ease-out both}
-    .skill-card:nth-child(1) .skill-progress-bar{width:40%}
-    .skill-card:nth-child(2) .skill-progress-bar{width:30%}
-    .skill-card:nth-child(3) .skill-progress-bar{width:50%}
-    .skill-card:nth-child(4) .skill-progress-bar{width:35%}
-    .skill-card:nth-child(5) .skill-progress-bar{width:45%}
-    .skill-card:nth-child(6) .skill-progress-bar{width:25%}
-
-    .resources-tabs{display:flex;gap:.5rem;margin-bottom:1rem}
-    .resource-tab{padding:.5rem .75rem;border-radius:.5rem;border:1px solid var(--border-color);background:transparent;cursor:pointer;color:var(--text-secondary)}
-    .resource-tab.active{color:var(--accent-primary);border-color:var(--accent-primary)}
+    .skill-level{color:var(--text-secondary);font-size:.94rem;margin-bottom:.45rem}
     .resources-list{display:flex;flex-direction:column;gap:.75rem}
-    .resource-item{display:flex;align-items:center;justify-content:space-between;background:var(--bg-secondary);padding:.75rem;border-radius:.6rem;border:1px solid var(--border-color)}
+    .resource-item{display:flex;align-items:center;justify-content:space-between;background:var(--bg-secondary);padding:.85rem 1rem;border-radius:.6rem;border:1px solid var(--border-color);transition:var(--transition)}
+    .resource-item:hover{border-color:var(--accent-primary);background:var(--bg-tertiary)}
     .resource-info{flex:1}
-    .resource-title{font-weight:700;color:var(--text-primary);margin-bottom:.25rem}
-    .resource-description{color:var(--text-secondary);font-size:.9rem;margin-bottom:.4rem}
-    .resource-meta{font-size:.85rem;color:var(--text-secondary)}
-    .resource-link{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--accent-tertiary);color:var(--accent-primary);text-decoration:none;margin-left:1rem}
-
-    .roadmap-actions{display:flex;gap:.75rem;justify-content:center;margin-top:1rem}
-    .action-btn{padding:.6rem 1rem;border-radius:.6rem;border:none;cursor:pointer;display:flex;align-items:center;gap:.5rem}
+    .resource-title{font-weight:700;color:var(--text-primary);margin-bottom:.12rem}
+    .resource-title a{color:var(--accent-primary);text-decoration:underline;transition:var(--transition)}
+    .resource-title a:hover{color:var(--accent-secondary)}
+    .resource-description{color:var(--text-secondary);font-size:.97rem;margin-bottom:.4rem}
+    .resource-meta{font-size:.88rem;color:var(--text-secondary)}
+    .roadmap-actions{display:flex;gap:1rem;justify-content:center;margin-top:2rem;}
+    .action-btn{padding:.6rem 1.2rem;border-radius:.65rem;border:none;cursor:pointer;display:flex;align-items:center;gap:.5rem;font-size:1.05rem;transition:var(--transition);text-decoration:none}
     .primary-btn{background:linear-gradient(135deg,var(--accent-primary),var(--accent-secondary));color:white}
+    .primary-btn:hover{transform:translateY(-2px);box-shadow:0 8px 16px rgba(0,102,255,0.2)}
     .secondary-btn{background:var(--bg-secondary);border:1px solid var(--accent-primary);color:var(--accent-primary)}
-
-    /* animations */
-    @keyframes progressFill{from{width:0}to{width:inherit}}
-    @keyframes slideInLeft{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
-
-    /* ===== modal styles (explicit and robust) ===== */
-    .modal-overlay{
-      display:none;
-      position:fixed;
-      inset:0;
-      align-items:center;
-      justify-content:center;
-      background:rgba(0,0,0,0.45);
-      z-index:var(--modal-z);
-      padding:1rem;
-      transition:opacity .18s ease;
-    }
-    .modal-overlay.open{display:flex}
-    .modal-panel{
-      width:min(820px,96%);
-      max-height:90vh;
-      overflow:auto;
-      background:var(--bg-primary);
-      border-radius:12px;
-      padding:1rem;
-      box-shadow:0 18px 36px rgba(2,6,23,0.18);
-      border:1px solid var(--border-color);
-      /* ensure modal text uses theme-aware color */
-      color: var(--text-primary);
-    }
-
-    /* Force modal children to use theme-aware colors unless they intentionally set accent */
-    .modal-panel * { color: inherit; }
-    .modal-panel a { color: var(--accent-primary); text-decoration: none; }
-    .modal-panel .profile-info-label { color: var(--text-secondary); font-size: .85rem; }
-    .modal-panel .profile-info-value { color: var(--text-primary); font-weight:700; }
-
-    .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
-    .modal-close-btn{background:transparent;border:none;padding:.35rem;border-radius:6px;cursor:pointer;color:var(--text-primary)}
-    .modal-close-btn i{font-size:1rem}
-    .profile-section{border-top:1px dashed var(--border-color);padding-top:.6rem;margin-top:.6rem}
-    .user-avatar{width:44px;height:44px;border-radius:999px;background:var(--accent-primary);color:white;display:flex;align-items:center;justify-content:center;font-weight:700}
-    .history-list{display:none}
-    .history-list.open{display:block}
-
-    /* toast */
-    .toast{position:fixed;right:1rem;bottom:1rem;background:rgba(12,20,40,0.9);color:#fff;padding:.6rem .9rem;border-radius:.5rem;font-weight:600;opacity:0;transform:translateY(8px);transition:opacity .18s,transform .18s;z-index:1400;pointer-events:none}
+    .secondary-btn:hover{background:var(--accent-tertiary)}
+    .toast{position:fixed;right:1rem;bottom:1rem;background:rgba(12,20,40,0.9);color:#fff;padding:.6rem .9rem;border-radius:.5rem;font-weight:600;opacity:0;transform:translateY(8px);transition:opacity .3s, transform .3s;z-index:2001}
     .toast.show{opacity:1;transform:translateY(0)}
-
-    /* responsive tweaks */
     @media(max-width:768px){
-      .timeline-item{padding-left:3.75rem}
-      .timeline::before{left:.75rem}
-      .resource-item{flex-direction:column;text-align:center}
-      .resource-link{margin-left:0;margin-top:.5rem}
+      .header-content{padding:0 0.5rem}
+      .logo h1{font-size:1.25rem}
       .skills-grid{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
       .roadmap-actions{flex-direction:column}
       .action-btn{width:100%}
     }
-
+    .resource-link {display: none !important;}
   </style>
 </head>
 <body>
+  <!-- Header with theme toggle -->
   <header class="header">
     <div class="header-content">
       <div class="logo">
@@ -170,76 +100,10 @@
         <h1>SkillVault</h1>
       </div>
       <div class="header-actions">
-        <button id="themeToggle" title="Toggle theme" aria-pressed="false"><i class="fas fa-moon"></i></button>
-        <button id="profileBtn" class="profile-btn" title="Open profile" aria-haspopup="dialog" aria-controls="modalOverlay">
-          <i class="fas fa-user"></i>
-        </button>
+        <button id="themeToggle" title="Toggle theme"><i class="fas fa-moon"></i></button>
       </div>
     </div>
   </header>
-
-  <!-- Profile Modal -->
-  <div id="modalOverlay" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="modal-panel" id="modalPanel" role="document" tabindex="-1">
-      <div class="modal-header">
-        <h2 style="margin:0;color:var(--text-primary)">Profile</h2>
-        <button id="modalCloseBtn" class="modal-close-btn" aria-label="Close profile dialog"><i class="fas fa-times"></i></button>
-      </div>
-
-      <div class="modal-content">
-        <!-- User Section -->
-        <div class="profile-section" id="profileInfo">
-          <div style="display:flex;align-items:center;gap:1rem">
-            <div class="user-avatar" id="userAvatar">N</div>
-            <div class="profile-info-item" id="nameDisplay">
-              <div class="profile-info-label">Full Name</div>
-              <div class="profile-info-value" id="displayName">Nadeem</div>
-            </div>
-          </div>
-          <button id="editToggleBtn" style="margin-top:.5rem;padding:.4rem .6rem;border-radius:.5rem;border:1px solid var(--border-color);background:transparent;cursor:pointer;color:var(--text-primary)">
-            <i class="fas fa-edit"></i> Edit Name
-          </button>
-        </div>
-
-        <!-- Contact Section -->
-        <div class="profile-section">
-          <div style="font-weight:700;margin-bottom:.25rem;color:var(--text-primary)">Contact Information</div>
-          <div style="margin-bottom:.4rem">
-            <div class="profile-info-label">Email</div>
-            <div class="profile-info-value" id="displayEmail">nadeem4380@example.com</div>
-          </div>
-          <div>
-            <div class="profile-info-label">Phone</div>
-            <div class="profile-info-value" id="displayPhone">+1 (555) 000-0000</div>
-          </div>
-        </div>
-
-        <!-- Social Section -->
-        <div class="profile-section">
-          <div style="font-weight:700;margin-bottom:.4rem;color:var(--text-primary)">Social Profiles</div>
-          <a href="#" class="profile-info-value" style="display:inline-block;margin-bottom:.25rem"><i class="fab fa-linkedin"></i> LinkedIn</a><br/>
-          <a href="#" class="profile-info-value" style="display:inline-block"><i class="fab fa-github"></i> GitHub</a>
-        </div>
-
-        <!-- History Section -->
-        <div class="profile-section">
-          <button id="historyToggleBtn" style="display:flex;justify-content:space-between;align-items:center;width:100%;padding:.5rem;border:none;background:transparent;cursor:pointer;color:var(--text-primary)">
-            <span><i class="fas fa-history"></i> My History</span>
-            <i class="fas fa-chevron-down"></i>
-          </button>
-          <div id="historyList" class="history-list">
-            <div style="text-align:center;padding:1rem;color:var(--text-secondary)"><p>No history yet</p></div>
-          </div>
-        </div>
-      </div>
-
-      <div style="text-align:right;margin-top:.5rem">
-        <button id="logoutBtn" style="padding:.5rem .75rem;border-radius:.5rem;background:var(--bg-secondary);border:1px solid var(--border-color);cursor:pointer;color:var(--text-primary)">
-          <i class="fas fa-sign-out-alt"></i> Logout
-        </button>
-      </div>
-    </div>
-  </div>
 
   <main class="main-container">
     <div class="roadmap-header">
@@ -247,282 +111,210 @@
       <h2 id="roadmapTitle">Career Roadmap</h2>
       <div style="width:80px"></div>
     </div>
-
-    <div class="roadmap-container">
-      <div class="timeline-section">
-        <h3 class="section-title">Your Learning Journey</h3>
-        <div id="timeline" class="timeline"></div>
-      </div>
-
-      <div class="skills-section">
-        <h3 class="section-title">Key Skills to Master</h3>
-        <div id="skillsGrid" class="skills-grid"></div>
-      </div>
-
-      <div class="resources-section">
-        <h3 class="section-title">Learning Resources</h3>
-        <div class="resources-tabs">
-          <button class="resource-tab active" data-category="courses"> <i class="fas fa-graduation-cap"></i> Courses</button>
-          <button class="resource-tab" data-category="books"> <i class="fas fa-book"></i> Books</button>
-          <button class="resource-tab" data-category="projects"> <i class="fas fa-code"></i> Projects</button>
-        </div>
-        <div id="resourcesList" class="resources-list"></div>
-      </div>
-
-      <div class="roadmap-actions">
-        <button id="saveRoadmapBtn" class="action-btn primary-btn"><i class="fas fa-save"></i> Save Roadmap</button>
-        <button id="shareRoadmapBtn" class="action-btn secondary-btn"><i class="fas fa-share-alt"></i> Share</button>
-        <a href="portfolio.html" class="action-btn primary-btn" style="text-decoration:none"><i class="fas fa-arrow-right"></i> Build Portfolio</a>
-      </div>
+    <div class="timeline-section">
+      <h3 class="section-title">Your Learning Journey</h3>
+      <div id="timeline" class="timeline"></div>
+    </div>
+    <div class="skills-section">
+      <h3 class="section-title">Key Skills to Master</h3>
+      <div id="skillsGrid" class="skills-grid"></div>
+    </div>
+    <div class="resources-section">
+      <h3 class="section-title">Learning Resources</h3>
+      <div id="resourcesList" class="resources-list"></div>
+    </div>
+    <div class="roadmap-actions">
+      <a href="portfolio.html" class="action-btn primary-btn"><i class="fas fa-arrow-right"></i> Build Portfolio</a>
     </div>
   </main>
-
-  <footer style="text-align:center;padding:1.25rem 0;color:var(--text-secondary)">
-    <p>&copy; 2025 SkillVault. All rights reserved.</p>
-  </footer>
 
   <div id="toast" class="toast" aria-live="polite"></div>
 
   <script>
-    // Non-destructive app stub (won't overwrite if app exists)
-    window.app = window.app || {
-      openModal() { openProfileModal(); },
-      closeModal() { closeProfileModal(); },
-      toggleTheme() {
-        const pressed = document.documentElement.classList.toggle('dark-theme');
-        const btn = document.getElementById('themeToggle');
-        if (btn) btn.setAttribute('aria-pressed', String(pressed));
-        // update icon
-        const icon = btn && btn.querySelector('i');
+    // ===== THEME INITIALIZATION AND TOGGLE =====
+    function initThemeFromStorage() {
+      const saved = localStorage.getItem('skillvault-theme');
+      if (saved === 'dark') {
+        document.documentElement.classList.add('dark-theme');
+      } else {
+        document.documentElement.classList.remove('dark-theme');
+      }
+    }
+
+    // Initialize theme immediately
+    initThemeFromStorage();
+
+    // Theme toggle function
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark-theme');
+      localStorage.setItem('skillvault-theme', isDark ? 'dark' : 'light');
+      const themeBtn = document.getElementById('themeToggle');
+      if (themeBtn) {
+        const icon = themeBtn.querySelector('i');
         if (icon) {
-          icon.className = pressed ? 'fas fa-sun' : 'fas fa-moon';
-        }
-        app.showToast('Theme toggled');
-      },
-      showToast(message, duration = 2200) {
-        const toast = document.getElementById('toast');
-        if (!toast) return;
-        toast.textContent = message;
-        toast.classList.add('show');
-        clearTimeout(this._toastTimer);
-        this._toastTimer = setTimeout(() => toast.classList.remove('show'), duration);
-      },
-      logout() { app.showToast('Logged out'); }
-    };
-
-    // Modal utilities
-    const modalOverlay = document.getElementById('modalOverlay');
-    const modalPanel = document.getElementById('modalPanel');
-    const profileBtn = document.getElementById('profileBtn');
-    const modalCloseBtn = document.getElementById('modalCloseBtn');
-
-    let lastFocusedBeforeModal = null;
-
-    function openProfileModal() {
-      if (!modalOverlay || !modalPanel) return;
-      lastFocusedBeforeModal = document.activeElement;
-      modalOverlay.classList.add('open');
-      modalOverlay.setAttribute('aria-hidden', 'false');
-      // move focus into modal
-      modalPanel.focus();
-      document.addEventListener('focus', enforceModalFocus, true);
-      document.addEventListener('keydown', handleModalKeydown);
-    }
-
-    function closeProfileModal() {
-      if (!modalOverlay) return;
-      modalOverlay.classList.remove('open');
-      modalOverlay.setAttribute('aria-hidden', 'true');
-      document.removeEventListener('focus', enforceModalFocus, true);
-      document.removeEventListener('keydown', handleModalKeydown);
-      if (lastFocusedBeforeModal && typeof lastFocusedBeforeModal.focus === 'function') {
-        lastFocusedBeforeModal.focus();
-      }
-    }
-
-    function enforceModalFocus(event) {
-      if (!modalOverlay || !modalOverlay.classList.contains('open')) return;
-      if (!modalPanel.contains(event.target)) {
-        event.stopPropagation();
-        modalPanel.focus();
-      }
-    }
-
-    function handleModalKeydown(e) {
-      if (e.key === 'Escape') {
-        closeProfileModal();
-      }
-      if (e.key === 'Tab') {
-        const focusables = modalPanel.querySelectorAll('a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])');
-        if (!focusables.length) return;
-        const first = focusables[0];
-        const last = focusables[focusables.length - 1];
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
-          last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
-          first.focus();
+          icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
         }
       }
+      showToast(isDark ? '🌙 Dark Mode' : '☀️ Light Mode');
     }
 
-    // Wire UI events safely
-    if (profileBtn) profileBtn.addEventListener('click', (e) => { e.preventDefault(); openProfileModal(); });
-    if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeProfileModal);
-    if (modalOverlay) {
-      modalOverlay.addEventListener('click', (e) => {
-        if (e.target === modalOverlay) closeProfileModal();
-      });
+    // Toast function
+    function showToast(msg, duration = 2200) {
+      const toast = document.getElementById('toast');
+      if (!toast) return;
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toast._toastTimer);
+      toast._toastTimer = setTimeout(() => toast.classList.remove('show'), duration);
     }
 
-    // theme toggle wiring - ensure icon & aria state align
-    const themeToggle = document.getElementById('themeToggle');
-    if (themeToggle) {
-      // initialize aria & icon based on current theme
-      const isDark = document.documentElement.classList.contains('dark-theme');
-      themeToggle.setAttribute('aria-pressed', String(isDark));
-      const icon = themeToggle.querySelector('i');
-      if (icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
-
-      themeToggle.addEventListener('click', () => app.toggleTheme());
-    }
-
-    // history toggle inside modal
-    const historyToggleBtn = document.getElementById('historyToggleBtn');
-    if (historyToggleBtn) historyToggleBtn.addEventListener('click', () => {
-      const h = document.getElementById('historyList');
-      if (h) h.classList.toggle('open');
+    // Setup theme toggle button
+    document.addEventListener('DOMContentLoaded', () => {
+      const themeToggle = document.getElementById('themeToggle');
+      if (themeToggle) {
+        // Update icon based on current theme
+        const isDark = document.documentElement.classList.contains('dark-theme');
+        const icon = themeToggle.querySelector('i');
+        if (icon) {
+          icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+        }
+        // Add click event
+        themeToggle.addEventListener('click', toggleTheme);
+      }
     });
 
-    // logout
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) logoutBtn.addEventListener('click', () => app.logout());
-
-    /**********************************************************************
-     * Roadmap rendering scripts (defensive)
-     **********************************************************************/
+    // ===== ROADMAP API AND RENDERING =====
     async function fetchAIRoadmap(goal) {
-  try {
-    const res = await fetch("https://skill-vault-backend.vercel.app/api/generate-roadmap", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ jobTitle: goal })
-    });
+      const res = await fetch("http://localhost:5000/generate-roadmap", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jobTitle: goal })
+      });
+      if (!res.ok) return null;
+      return await res.json();
+    }
 
-    const data = await res.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching AI roadmap:", error);
-    return null;
-  }
-}
-    
     const roadmapApp = {
       goal: null,
-      init() {
-        this.goal = localStorage.getItem('skillvault-goal') || 'Software Engineer';
-        const title = document.getElementById('roadmapTitle');
-        if (title) title.textContent = `Roadmap for ${this.goal}`;
-        this.loadAIRoadmap();
-        this.bindEvents();
-        async loadAIRoadmap() {
+      async init() {
+        this.goal = localStorage.getItem("skillvault-goal") || "Frontend Developer";
+        document.getElementById("roadmapTitle").textContent = `Roadmap for ${this.goal}`;
         const data = await fetchAIRoadmap(this.goal);
-
-        if (!data) return;
-
+        window.lastApiResponse = data;
+        if (!data || !Array.isArray(data.phases)) {
+          document.getElementById("timeline").innerHTML = "<b>No data loaded</b>";
+          document.getElementById("skillsGrid").innerHTML = "<b>No data loaded</b>";
+          document.getElementById("resourcesList").innerHTML = "<b>No data loaded</b>";
+          return;
+        }
         this.renderTimeline(data.phases);
         this.renderSkills(data.phases);
-        this.renderResources(data.phases);
-      }
+        this.renderResources(data.phases, data);
       },
-     renderTimeline(phases) {
-  const timeline = document.getElementById('timeline');
-
-  timeline.innerHTML = phases.map((phase, index) => `
-    <div class="timeline-item">
-      <div class="timeline-content">
-        <div class="timeline-month">${phase.duration}</div>
-        <div class="timeline-title">${phase.phase_name}</div>
-        <div class="timeline-description">
-          ${phase.topics.join(", ")}
-        </div>
-        <div>
-          ${phase.topics.map(t => `<span class="timeline-topic">${t}</span>`).join('')}
-        </div>
-      </div>
-    </div>
-  `).join('');
-},
-      renderSkills(phases) {
-  const skillsGrid = document.getElementById('skillsGrid');
-
-  const allSkills = phases.flatMap(p => p.topics).slice(0, 6);
-
-  skillsGrid.innerHTML = allSkills.map(skill => `
-    <div class="skill-card">
-      <div class="skill-icon"><i class="fas fa-code"></i></div>
-      <div class="skill-name">${skill}</div>
-      <div class="skill-level">Learning</div>
-      <div class="skill-progress">
-        <div class="skill-progress-bar"></div>
-      </div>
-    </div>
-  `).join('');
-},
-      renderResources(phases) {
-  const resourcesList = document.getElementById('resourcesList');
-
-  const allResources = phases.flatMap(p => p.resources || []);
-
-  resourcesList.innerHTML = allResources.map(r => `
-    <div class="resource-item">
-      <div class="resource-info">
-        <div class="resource-title">${r}</div>
-        <div class="resource-description">Recommended learning resource</div>
-        <div class="resource-meta">AI Suggested</div>
-      </div>
-      <a href="#" class="resource-link">
-        <i class="fas fa-arrow-right"></i>
-      </a>
-    </div>
-  `).join('');
-};
-        const items = resources[category] || resources.courses;
-        resourcesList.innerHTML = items.map(r => `
-          <div class="resource-item">
-            <div class="resource-info">
-              <div class="resource-title">${r.title}</div>
-              <div class="resource-description">${r.description}</div>
-              <div class="resource-meta">${r.platform} • ${r.duration} • ${r.level}</div>
+      renderTimeline(phases) {
+        const timeline = document.getElementById("timeline");
+        timeline.innerHTML = phases.map(phase => `
+          <div class="timeline-item">
+            <div class="timeline-content">
+              <div class="timeline-month">${phase.phase_name || ""}</div>
+              <div class="timeline-description">${(phase.topics || []).join(", ")}</div>
+              <div>
+                ${(phase.topics || []).map(t => `<span class="timeline-topic">${t}</span>`).join("")}
+              </div>
             </div>
-            <a href="#" class="resource-link" aria-label="Open resource"><i class="fas fa-arrow-right"></i></a>
-          </div>
-        `).join('');
+          </div>`).join("");
       },
-      bindEvents() {
-        document.querySelectorAll('.resource-tab').forEach(tab => {
-          tab.addEventListener('click', (e) => {
-            document.querySelectorAll('.resource-tab').forEach(t => t.classList.remove('active'));
-            e.currentTarget.classList.add('active');
-            const cat = e.currentTarget.dataset.category;
-            this.generateResources(cat);
-          });
-        });
+      renderSkills(phases) {
+        const skillsGrid = document.getElementById("skillsGrid");
+        let allSkills = [];
+        const skillsPhase = phases.find(p => p.phase_name && p.phase_name.toLowerCase().includes("skill"));
+        if (skillsPhase) allSkills = skillsPhase.topics;
+        else allSkills = [...new Set(phases.flatMap(p=>p.topics||[]))].slice(0,6);
+        skillsGrid.innerHTML = allSkills.map(skill => `
+          <div class="skill-card">
+            <div class="skill-icon"><i class="fas fa-code"></i></div>
+            <div class="skill-name">${skill}</div>
+            <div class="skill-level">Learning</div>
+          </div>
+        `).join("");
+      },
+      renderResources(phases, apiData) {
+        const resourcesList = document.getElementById("resourcesList");
+        let courses = (apiData && apiData.courses) ? apiData.courses : [];
+        let books = (apiData && apiData.books) ? apiData.books : [];
+        let projects = (apiData && apiData.projects) ? apiData.projects : [];
 
-        const saveBtn = document.getElementById('saveRoadmapBtn');
-        if (saveBtn) saveBtn.addEventListener('click', () => {
-          app.showToast('✅ Roadmap saved successfully!');
-          const roadmapData = { goal: this.goal, savedAt: new Date().toISOString(), type: 'Roadmap' };
-          let history = JSON.parse(localStorage.getItem('skillvault-history') || '[]');
-          history.unshift(roadmapData);
-          localStorage.setItem('skillvault-history', JSON.stringify(history.slice(0,10)));
-        });
+        const coursesPhase = phases.find(p => p.phase_name && /course/i.test(p.phase_name));
+        const booksPhase = phases.find(p => p.phase_name && /book/i.test(p.phase_name));
+        const projectsPhase = phases.find(p => p.phase_name && /project/i.test(p.phase_name));
 
-        const shareBtn = document.getElementById('shareRoadmapBtn');
-        if (shareBtn) shareBtn.addEventListener('click', () => app.showToast('📤 Share feature coming soon!'));
+        if ((!Array.isArray(courses) || courses.length === 0) && coursesPhase)
+          courses = (coursesPhase.topics || []).map(name => ({ name }));
+
+        if ((!Array.isArray(books) || books.length === 0) && booksPhase)
+          books = (booksPhase.topics || []).map(title => ({ title }));
+
+        if ((!Array.isArray(projects) || projects.length === 0) && projectsPhase)
+          projects = projectsPhase.topics || [];
+
+        let html = "";
+
+        // Courses as Google search links
+        if (courses.length > 0) {
+          html += `<div style="font-weight:bold;margin-bottom:0.5em;color:var(--text-primary);">Courses</div>`;
+          for (const course of courses) {
+            const cname = course.name || course.title;
+            if (cname) {
+              const gsearch = encodeURIComponent(cname);
+              html += `<div class="resource-item">
+                <div class="resource-info">
+                  <div class="resource-title">
+                    <a href="https://www.google.com/search?q=${gsearch}" target="_blank" rel="noopener">${cname}</a>
+                  </div>
+                  <div class="resource-description">Course</div>
+                </div>
+              </div>`;
+            }
+          }
+        }
+        // Books with Google search link
+        if (books.length > 0) {
+          html += `<div style="font-weight:bold;margin:1em 0 0.5em 0;color:var(--text-primary);">Books</div>`;
+          for (const book of books) {
+            if (book.title) {
+              const gsearch = encodeURIComponent(`${book.title||""} ${book.author||""}`);
+              html += `<div class="resource-item">
+                <div class="resource-info">
+                  <div class="resource-title">
+                    <a href="https://www.google.com/search?q=${gsearch}" target="_blank" rel="noopener">${book.title}</a>
+                  </div>
+                  <div class="resource-description">Book${book.author ? " by " + book.author : ""}</div>
+                </div>
+              </div>`;
+            }
+          }
+        }
+        // Projects as Google search links
+        if (projects.length > 0) {
+          html += `<div style="font-weight:bold;margin:1em 0 0.5em 0;color:var(--text-primary);">Projects</div>`;
+          for (const proj of projects) {
+            if (proj && typeof proj === "string") {
+              const gsearch = encodeURIComponent(proj);
+              html += `<div class="resource-item">
+                <div class="resource-info">
+                  <div class="resource-title">
+                    <a href="https://www.google.com/search?q=${gsearch}" target="_blank" rel="noopener">${proj}</a>
+                  </div>
+                  <div class="resource-description">Project</div>
+                </div>
+              </div>`;
+            }
+          }
+        }
+        if (!html) {
+          html = `<div><em>No learning resources found for this job.</em></div>`;
+        }
+        resourcesList.innerHTML = html;
       }
     };
 
