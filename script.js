@@ -1,3 +1,6 @@
+console.log("Saved goal is", localStorage.getItem("skillvault-goal"));
+console.log("SkillVault script loaded!");
+
 const app = {
     modal: null,
     modalOverlay: null,
@@ -103,6 +106,9 @@ const app = {
         if (saved === 'dark') {
             document.documentElement.classList.add('dark-theme');
             this.themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        } else {
+            document.documentElement.classList.remove('dark-theme');
+            this.themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
         }
     },
 
@@ -129,9 +135,7 @@ const app = {
         }
         localStorage.setItem('skillvault-goal', goal);
         this.showToast(`✨ Creating roadmap for: ${goal}`);
-        setTimeout(() => {
-            window.location.href = 'roadmap.html';
-        }, 1500);
+        window.location.href = 'roadmap.html'; // Go instantly, no delay!
     },
 
     handleBuild() {
