@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const themeToggleBtn = safe('#themeToggleBtn');
 
   // theme toggle initialization + handler
-  const THEME_KEY = 'skillvault_theme';
+  const THEME_KEY = 'skillvault-theme';
   (function initThemeToggle(){
     try {
       const saved = localStorage.getItem(THEME_KEY);
@@ -417,10 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // wire generate resume button (in settings area)
   if (generateResumeBtn) {
     generateResumeBtn.addEventListener('click', () => {
-      const html = buildResumeHtml();
-      const b = new Blob([html], { type:'text/html' });
-      const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = (state.name||'resume') + '.html'; a.click(); URL.revokeObjectURL(a.href);
-      toast('Resume generated');
+      downloadPDF();
     });
   }
 
@@ -458,11 +455,343 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // resume & preview builders
   function buildResumeHtml(){
-    const skillsHtml = (state.skills||[]).map(s=>'<li>'+escapeHtml(s)+'</li>').join('');
-    const projectsHtml = (state.projects||[]).map(p=>'<li><strong>'+escapeHtml(p.title)+'</strong><div>'+escapeHtml(p.description||'')+'</div></li>').join('');
-    const educationHtml = (state.education||[]).map(e=>'<li><strong>'+escapeHtml(e.degree)+'</strong> — '+escapeHtml(e.institution)+' <div class="muted">'+escapeHtml(e.years)+'</div></li>').join('');
-    const socialsHtml = (state.contact.socials||'').split(',').map(s=>s.trim()).filter(Boolean).map(s=>'<li>'+escapeHtml(s)+'</li>').join('');
-    return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+escapeHtml(state.name||'Resume')+'</title><style>body{font-family:Inter,Arial,sans-serif;padding:24px;color:#0f1724}h1{margin:0}h2{margin:.5rem 0}.muted{color:#64748b;font-size:13px}</style></head><body><h1>'+escapeHtml(state.name||'Your Name')+'</h1><h2>'+escapeHtml(state.headline||'Headline')+'</h2><p>'+escapeHtml(state.summary||'Summary')+'</p><h3>Education</h3><ul>'+educationHtml+'</ul><h3>Skills</h3><ul>'+skillsHtml+'</ul><h3>Projects</h3><ul>'+projectsHtml+'</ul><h3>Contact</h3><ul><li>'+escapeHtml(state.contact.email||'')+'</li><li>'+escapeHtml(state.contact.phone||'')+'</li>'+socialsHtml+'</ul></body></html>';
+    const accent = '#1a365d'; // Dark blue
+    
+    let skillsHtml = '';
+    if (state.skills && state.skills.length > 0) {
+      skillsHtml = `
+      <div class="section-title">Skills</div>
+      <ul class="skills-list">
+        <li>${escapeHtml(state.skills.join(', '))}</li>
+      </ul>`;
+    }
+
+    let projectsHtml = '';
+    if (state.projects && state.projects.length > 0) {
+      projectsHtml = `
+      <div class="section-title">Projects</div>
+      ${state.projects.map(p => `
+        <div class="item">
+          <div class="item-header">
+            <strong>${escapeHtml(p.title)}</strong>
+            ${p.link || p.repo ? `<span class="date">${[p.link, p.repo].filter(Boolean).map(l => `<a href="${escapeHtml(l)}">${escapeHtml(l)}</a>`).join(' | ')}</span>` : ''}
+          </div>
+          ${p.tech && p.tech.length > 0 ? `<div class="tech">Tech: ${escapeHtml(p.tech.join(', '))}</div>` : ''}
+          <div class="desc">${escapeHtml(p.description || '')}</div>
+        </div>
+      `).join('')}
+      `;
+    }
+
+    let educationHtml = '';
+    if (state.education && state.education.length > 0) {
+      educationHtml = `
+      <div class="section-title">Education</div>
+      ${state.education.map(e => `
+        <div class="item">
+          <div class="item-header">
+            <strong>${escapeHtml(e.degree)}</strong> | ${escapeHtml(e.institution)}
+            <span class="date">${escapeHtml(e.years)}</span>
+          </div>
+        </div>
+      `).join('')}
+      `;
+    }
+
+    const socialsList = (state.contact.socials || '').split(',').map(s => s.trim()).filter(Boolean);
+    let contactLinks = [];
+    if (state.contact.email) contactLinks.push(`Email: <a href="mailto:${escapeHtml(state.contact.email)}">${escapeHtml(state.contact.email)}</a>`);
+    if (state.contact.phone) contactLinks.push(`Phone: ${escapeHtml(state.contact.phone)}`);
+    if (state.contact.website) contactLinks.push(`Website: <a href="${escapeHtml(state.contact.website)}">${escapeHtml(state.contact.website)}</a>`);
+    socialsList.forEach(s => contactLinks.push(`<a href="${escapeHtml(s.includes('://') ? s : 'https://'+s)}">${escapeHtml(s)}</a>`));
+    const contactHtml = contactLinks.join(' | ');
+
+    return `
+      <div class="resume-container">
+        <style>
+          .resume-container {
+            font-family: 'Times New Roman', Times, serif;
+            color: #000;
+            line-height: 1.5;
+            font-size: 11pt;
+            padding: 38px 48px;
+            background: #fff;
+            width: 100%;
+            box-sizing: border-box;
+          }
+          .resume-container h1 {
+            text-align: center;
+            color: ${accent};
+            font-size: 24pt;
+            margin: 0 0 5px 0;
+            font-weight: bold;
+            text-transform: uppercase;
+          }
+          .resume-container .contact-info {
+            text-align: center;
+            font-size: 10pt;
+            margin-bottom: 20px;
+          }
+          .resume-container .contact-info a {
+            color: ${accent};
+            text-decoration: none;
+          }
+          .resume-container .section-title {
+            color: ${accent};
+            text-transform: uppercase;
+            font-size: 12pt;
+            border-bottom: 1px solid ${accent};
+            margin-top: 15px;
+            margin-bottom: 10px;
+            padding-bottom: 2px;
+            font-weight: bold;
+          }
+          .resume-container p {
+            margin: 0 0 10px 0;
+            font-size: 11pt;
+            text-align: justify;
+          }
+          .resume-container .item {
+            margin-bottom: 12px;
+          }
+          .resume-container .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+          }
+          .resume-container .item-header strong {
+            font-size: 11pt;
+          }
+          .resume-container .date {
+            font-size: 10pt;
+          }
+          .resume-container .date a {
+            color: ${accent};
+            text-decoration: none;
+          }
+          .resume-container .tech {
+            font-size: 10pt;
+            font-style: italic;
+            color: #444;
+            margin-top: 2px;
+          }
+          .resume-container .desc {
+            margin-top: 4px;
+            font-size: 11pt;
+            text-align: justify;
+          }
+          .resume-container .skills-list {
+            margin: 0;
+            padding-left: 20px;
+          }
+          .resume-container .skills-list li {
+            margin-bottom: 4px;
+          }
+        </style>
+        
+        <h1>${escapeHtml(state.name || 'Your Name')}</h1>
+        <div class="contact-info">${contactHtml}</div>
+        
+        ${state.summary ? `
+        <div class="section-title">Professional Summary</div>
+        <p>${escapeHtml(state.summary)}</p>
+        ` : ''}
+        
+        ${skillsHtml}
+        ${projectsHtml}
+        ${educationHtml}
+      </div>
+    `;
+  }
+
+  function downloadPDF() {
+    // Access jsPDF from the html2pdf bundle (it exposes window.jspdf)
+    var jsPDFClass = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+    if (!jsPDFClass) {
+      toast('PDF generator loading, please try again...');
+      return;
+    }
+
+    try {
+      var doc = new jsPDFClass({ unit: 'pt', format: 'letter', orientation: 'portrait' });
+      var pageW = doc.internal.pageSize.getWidth();   // 612 pt
+      var pageH = doc.internal.pageSize.getHeight();  // 792 pt
+      var marginL = 50, marginR = 50, marginT = 50, marginB = 50;
+      var contentW = pageW - marginL - marginR;
+      var y = marginT;
+      var accentR = 26, accentG = 54, accentB = 93; // #1a365d
+
+      // --- Helpers ---
+      function checkPage(needed) {
+        if (y + needed > pageH - marginB) {
+          doc.addPage();
+          y = marginT;
+        }
+      }
+
+      function drawSectionTitle(title) {
+        checkPage(28);
+        y += 6;
+        doc.setFont('times', 'bold');
+        doc.setFontSize(12);
+        doc.setTextColor(accentR, accentG, accentB);
+        doc.text(title.toUpperCase(), marginL, y);
+        y += 3;
+        doc.setDrawColor(accentR, accentG, accentB);
+        doc.setLineWidth(0.6);
+        doc.line(marginL, y, pageW - marginR, y);
+        y += 14;
+      }
+
+      function drawWrappedText(text, fontSize, fontStyle, indent) {
+        indent = indent || 0;
+        doc.setFont('times', fontStyle || 'normal');
+        doc.setFontSize(fontSize || 11);
+        doc.setTextColor(0, 0, 0);
+        var lines = doc.splitTextToSize(text, contentW - indent);
+        for (var i = 0; i < lines.length; i++) {
+          checkPage(fontSize + 3);
+          doc.text(lines[i], marginL + indent, y);
+          y += fontSize + 3;
+        }
+      }
+
+      // === 1. NAME ===
+      doc.setFont('times', 'bold');
+      doc.setFontSize(22);
+      doc.setTextColor(accentR, accentG, accentB);
+      var nameText = (state.name || 'Your Name').toUpperCase();
+      doc.text(nameText, pageW / 2, y, { align: 'center' });
+      y += 10;
+
+      // === 2. HEADLINE ===
+      if (state.headline) {
+        doc.setFont('times', 'italic');
+        doc.setFontSize(11);
+        doc.setTextColor(80, 80, 80);
+        doc.text(state.headline, pageW / 2, y, { align: 'center' });
+        y += 14;
+      }
+
+      // === 3. CONTACT INFO ===
+      var contactParts = [];
+      if (state.contact.email) contactParts.push(state.contact.email);
+      if (state.contact.phone) contactParts.push('Phone: ' + state.contact.phone);
+      if (state.contact.website) contactParts.push(state.contact.website);
+      var socials = (state.contact.socials || '').split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+      socials.forEach(function(s){ contactParts.push(s); });
+
+      if (contactParts.length > 0) {
+        doc.setFont('times', 'normal');
+        doc.setFontSize(10);
+        doc.setTextColor(0, 0, 0);
+        var contactLine = contactParts.join('  |  ');
+        // Wrap if too long
+        var contactLines = doc.splitTextToSize(contactLine, contentW);
+        for (var ci = 0; ci < contactLines.length; ci++) {
+          doc.text(contactLines[ci], pageW / 2, y, { align: 'center' });
+          y += 13;
+        }
+      }
+      y += 4;
+
+      // === 4. PROFESSIONAL SUMMARY ===
+      if (state.summary) {
+        drawSectionTitle('Professional Summary');
+        drawWrappedText(state.summary, 11, 'normal');
+        y += 2;
+      }
+
+      // === 5. SKILLS ===
+      if (state.skills && state.skills.length > 0) {
+        drawSectionTitle('Skills');
+        // Group skills with bullet point style
+        var skillsText = state.skills.join(',  ');
+        doc.setFont('times', 'normal');
+        doc.setFontSize(11);
+        doc.setTextColor(0, 0, 0);
+        var skillLines = doc.splitTextToSize(skillsText, contentW);
+        for (var si = 0; si < skillLines.length; si++) {
+          checkPage(14);
+          doc.text(skillLines[si], marginL, y);
+          y += 14;
+        }
+        y += 2;
+      }
+
+      // === 6. PROJECTS ===
+      if (state.projects && state.projects.length > 0) {
+        drawSectionTitle('Projects');
+        for (var pi = 0; pi < state.projects.length; pi++) {
+          var p = state.projects[pi];
+          checkPage(36);
+
+          // Project title (bold)
+          doc.setFont('times', 'bold');
+          doc.setFontSize(11);
+          doc.setTextColor(0, 0, 0);
+          doc.text(p.title || 'Untitled', marginL, y);
+
+          // Links on the right
+          var links = [p.link, p.repo].filter(Boolean);
+          if (links.length > 0) {
+            doc.setFont('times', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(accentR, accentG, accentB);
+            doc.text(links.join('  |  '), pageW - marginR, y, { align: 'right' });
+          }
+          y += 14;
+
+          // Tech stack (italic)
+          if (p.tech && p.tech.length > 0) {
+            doc.setFont('times', 'italic');
+            doc.setFontSize(10);
+            doc.setTextColor(80, 80, 80);
+            doc.text('Tech: ' + p.tech.join(', '), marginL + 8, y);
+            y += 13;
+          }
+
+          // Description
+          if (p.description) {
+            drawWrappedText(p.description, 10.5, 'normal', 8);
+          }
+          y += 6;
+        }
+      }
+
+      // === 7. EDUCATION ===
+      if (state.education && state.education.length > 0) {
+        drawSectionTitle('Education');
+        for (var ei = 0; ei < state.education.length; ei++) {
+          var ed = state.education[ei];
+          checkPage(24);
+
+          // Degree | Institution
+          doc.setFont('times', 'bold');
+          doc.setFontSize(11);
+          doc.setTextColor(0, 0, 0);
+          var eduText = (ed.degree || '') + (ed.institution ? '  |  ' + ed.institution : '');
+          doc.text(eduText, marginL, y);
+
+          // Years on the right
+          if (ed.years) {
+            doc.setFont('times', 'normal');
+            doc.setFontSize(10);
+            doc.text(ed.years, pageW - marginR, y, { align: 'right' });
+          }
+          y += 18;
+        }
+      }
+
+      // === SAVE ===
+      var pdfFilename = (state.name || 'resume').replace(/\s+/g, '_') + '.pdf';
+      doc.save(pdfFilename);
+      toast('Resume downloaded as PDF');
+
+    } catch(err) {
+      console.warn('PDF generation error:', err);
+      toast('Download failed: ' + err.message);
+    }
   }
 
   function buildPublicPageHtml(){
@@ -488,7 +817,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const imgHtml = state.profileImage ? `<img class=\"pv-avatar\" src=\"${state.profileImage}\" alt=\"${escapeHtml(state.name||'')}\"/>` : `<div class=\"pv-avatar pv-avatar-fallback\">${escapeHtml((state.name||'').split(' ').map(x=>x[0]).slice(0,2).join(''))}</div>`;
 
-    const resumeDataUrl = 'data:text/html;charset=utf-8,' + encodeURIComponent(buildResumeHtml());
+    const resumeHtmlContent = buildResumeHtml();
 
     return `<!doctype html>
 <html>
@@ -496,6 +825,7 @@ document.addEventListener('DOMContentLoaded', () => {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>${escapeHtml(state.name||'Portfolio')}</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     :root{--accent:${accent};--text:#0f1724;--muted:#64748b;--bg:#ffffff}
     .dark-theme{--text:#e6eef9;--muted:#9fb0c8;--bg:#071226}
@@ -548,7 +878,7 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
       <div class="top-actions">
         <button id="themeToggleBtn" class="btn">Toggle theme</button>
-        <a class="btn primary" id="downloadResume" href="${resumeDataUrl}" download="${escapeHtml((state.name||'resume'))}.html">Download Resume</a>
+        <a class="btn primary" id="downloadResume" href="#">Download Resume</a>
       </div>
       <header>
         ${imgHtml}
@@ -577,7 +907,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   <script>
     (function(){
-      const THEME_KEY = 'skillvault_theme';
+      const THEME_KEY = 'skillvault-theme';
       const root = document.documentElement;
       const btn = document.getElementById('themeToggleBtn');
       function applySaved(){ try{ const s = localStorage.getItem(THEME_KEY); if(s==='dark') root.classList.add('dark-theme'); else root.classList.remove('dark-theme'); }catch(e){}
@@ -594,6 +924,23 @@ document.addEventListener('DOMContentLoaded', () => {
         shards.forEach(function(s,i){ const tx = dx*(10 + i*6); const ty = dy*(8 + i*4); s.style.transform = 'translate3d(' + tx + 'px, ' + ty + 'px, 0) rotate(' + (dx*6) + 'deg)'; });
       });
       card.addEventListener('mouseleave', ()=> shards.forEach(s=> s.style.transform=''));
+      }
+      
+      const downloadResumeBtn = document.getElementById('downloadResume');
+      if (downloadResumeBtn) {
+        downloadResumeBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          if (typeof html2pdf === 'undefined') return;
+          const resumeHtml = decodeURIComponent("${encodeURIComponent(resumeHtmlContent)}");
+          const opt = {
+            margin: 0.5,
+            filename: '${escapeHtml(state.name||'resume').replace(/\\s+/g, '_')}.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+          };
+          html2pdf().set(opt).from(resumeHtml).save();
+        });
       }
     })();
   </script>
@@ -642,10 +989,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (generateResumeBtn) {
     generateResumeBtn.addEventListener('click', () => {
       try {
-        const blob = new Blob([buildResumeHtml()], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = (state.name || 'resume') + '.html'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
-        toast('Resume generated');
+        downloadPDF();
       } catch ( e) { console.warn(e); toast('Generate failed'); }
     });
   }
@@ -653,9 +997,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (downloadResumeBtn) {
     downloadResumeBtn.addEventListener('click', () => {
       try {
-        const blob = new Blob([buildResumeHtml()], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = (state.name || 'resume') + '.html'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+        downloadPDF();
       } catch ( e) { console.warn(e); }
     });
   }
