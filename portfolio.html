@@ -1,13 +1,18 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>SkillVault — Portfolio Builder</title>
 
   <link rel="stylesheet" href="portfolio.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    crossorigin="anonymous" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
+
 <body>
   <div class="wrap" id="builderApp">
     <aside class="left" id="leftPanel" aria-label="Live preview">
@@ -29,7 +34,8 @@
 
         <div class="preview-actions" style="margin-top:12px;">
           <button id="previewPublicBtn" class="btn ghost" title="Preview public">Preview public</button>
-          <button id="downloadResume" class="btn primary" title="Download resume"><i class="fas fa-download"></i> Resume</button>
+          <button id="downloadResume" class="btn primary" title="Download resume"><i class="fas fa-download"></i>
+            Resume</button>
         </div>
 
         <div class="spacer"></div>
@@ -138,7 +144,8 @@
         <div class="muted">Upload a PDF resume or generate a basic downloadable resume from your data.</div>
         <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
           <input id="resumeUpload" type="file" accept=".pdf,.doc,.docx" />
-          <button id="generateResumeBtn" class="btn primary"><i class="fas fa-file-export"></i> Generate & Download</button>
+          <button id="generateResumeBtn" class="btn primary"><i class="fas fa-file-export"></i> Generate &
+            Download</button>
         </div>
 
         <div class="muted" style="margin-top:8px">Export / Save</div>
@@ -177,7 +184,8 @@
         <label for="projThumb">Thumb color</label>
         <input id="projThumb" name="thumb" type="color" value="#4fc3f7" />
         <div style="grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px">
-          <button type="button" id="projectDeleteBtn" class="btn ghost" style="display:none;color:#E03D3D">Delete</button>
+          <button type="button" id="projectDeleteBtn" class="btn ghost"
+            style="display:none;color:#E03D3D">Delete</button>
           <button type="submit" class="btn primary">Save project</button>
         </div>
         <input type="hidden" id="projId" />
@@ -200,7 +208,8 @@
         <label for="eduYears">Years</label>
         <input id="eduYears" placeholder="2018–2022" />
         <div style="grid-column:1/-1;display:flex;justify-content:flex-end;gap:8px">
-          <button type="button" id="educationDeleteBtn" class="btn ghost" style="display:none;color:#E03D3D">Delete</button>
+          <button type="button" id="educationDeleteBtn" class="btn ghost"
+            style="display:none;color:#E03D3D">Delete</button>
           <button type="submit" class="btn primary">Save education</button>
         </div>
         <input type="hidden" id="eduId" />
@@ -212,4 +221,5 @@
 
   <script src="portfolio.js"></script>
 </body>
+
 </html>
