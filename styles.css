@@ -414,6 +414,7 @@ body.modal-open {
     transform: scale(0.95);
 }
 
+
 .card.active-card {
     opacity: 1;
     transform: scale(1);
